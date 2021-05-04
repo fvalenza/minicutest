@@ -5,8 +5,7 @@ SRC_DIR := src
 OBJ_DIR := obj
 BIN_DIR := bin
 
-EXTERNAL_INC_DIR := ../
-# INC_DIR += $(EXTERNAL_INC_DIR)
+EXTERNAL_INC_DIR := ..
 
 EXE := $(BIN_DIR)/mct
 
@@ -19,7 +18,7 @@ OBJ := $(patsubst $(SRC_DIR)/%.c, $(OBJ_DIR)/%.o, $(SRC))
 
 
 CC=gcc
-CPPFLAGS := -Iinclude -MMD -MP # -I is a preprocessor flag, not a compiler flag
+CPPFLAGS := -I$(INC_DIR) -I$(EXTERNAL_INC_DIR) -MMD -MP # -I is a preprocessor flag, not a compiler flag
 CFLAGS=-W -Wall -pedantic
 LDFLAGS  :=               # -L is a linker flag, -> path to the libraries to be linked to (see it as include_dir : -Lpath/to/ldlibs)
 LDLIBS   :=                 # Left empty if no libs are needed -> The libraries to link to
@@ -47,9 +46,10 @@ $(OBJ_DIR)/%.o: $(SRC_DIR)/%.c | $(OBJ_DIR)
 $(BIN_DIR) $(OBJ_DIR):
 	mkdir -p $@
 
-
-tests: all
+run: all
 	./$(EXE)
+
+tests: run
 
 # clean:
 # 	rm -f $(ODIR)/*.o
@@ -61,6 +61,4 @@ mr_proper: clean
 
 -include $(OBJ:.o=.d)
 
-# 	macro that must end with semicolon shall be lowercasae.
-# 	macro that dont need semicolon shall be uppercase.
-# 	internal macro shall be ??? upper or lower ?? with __MACRO__ ???
+

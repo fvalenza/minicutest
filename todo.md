@@ -7,3 +7,21 @@ TODOLISt
 - Add exemples
 - Rework verbosity ?
 - Add boolean ? With user defined boolean macros ??
+
+
+List of asserts to do:
+---
+
+- MCU_LOG
+
+- MCU_ASSERT(expr) -> if ((expr))
+- MCU_ASSERT_TRUE -> 
+- MCU_ASSERT_FALSE ->
+- 
+- MCU_ASSERT_PTR_NULL
+- MCU_ASSERT_PTR_NOT_NULL
+
+
+# 	macro that must end with semicolon shall be lowercasae.
+# 	macro that dont need semicolon shall be uppercase.
+# 	internal macro shall be ??? upper or lower ?? with __MACRO__ ???
