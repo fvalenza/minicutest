@@ -55,40 +55,10 @@
 static char group_report[500000]; // should be long enough to hold full report
 
 
-#define MCU_ASSERT_BASE(test_suite, test_case, expr, message)                            \
-    do {                                                              \
-        *nb_tests+=1;                                                 \
-        if ( !(expr) ) {                                \
-            *nb_failed+=1;                                              \
-            ASSERT_LOG(__FILENAME__, test_suite, test_case, __LINE__, message);  \
-        }                                                             \
-    } while (0)
-
-
-#define mcu_assert(expr, message) \
-    MCU_ASSERT_BASE(test_suite, __func__, (expr), "\""#expr" is not true\"");
-
-
-#define mcu_assert_true(expr) \
-    MCU_ASSERT_BASE(test_suite, __func__, (expr), "\""#expr" is not true\"");
-
-
-#define mcu_assert_false(expr) \
-    MCU_ASSERT_BASE(test_suite, __func__, !(expr), "\""#expr" is true\"");
-
-// #define assert_true(expr) do { \
-//     ASSERT_BASE(test_suite, __func__, expr, "\""#expr" not true"); \
-//     *nb_tests+=1;                                                 \
-//     if ( !(expr) ) {                                \
-//         *nb_failed+=1;                                              \
-//         ASSERT_LOG(__FILENAME__, test_suite, test_case, __LINE__, message);  \
-//     }  \
-// } while (0)
-
-
 ///
 /// \brief Basic print/log function.
-///         Builds the message with usefull information of where the assert has failed and call LOG_FUNCTION
+///         Builds the message with useful information of where the assert has failed and call LOG_FUNCTION
+///         One shall not use this MACRO. Internlly called by other macros
 ///
 /// \param[in] filename Name of the file where this macro is called
 /// \param[in] test_suite Name of the test_suite where this macro is called
@@ -96,8 +66,111 @@ static char group_report[500000]; // should be long enough to hold full report
 /// \param[in] line Line of the source file where this macro is called
 /// \param[in] message The message to print
 ///
-#define ASSERT_LOG(filename, test_suite, test_case, line, message) \
-    LOG_FUNCTION("%s::%s::%s:%u - Assertion failed : %s \n", filename, test_suite, test_case, line, message)
+#define MCU_LOG_BASE(filename, test_suite, test_case, line, message) \
+    LOG_FUNCTION("%s::%s::%s:%u - Assertion failed : %s \n", filename, test_suite, test_case, line, message);
+
+
+///
+/// \brief Check within a test_case of a test_suite if the expression is true (C-like trueness)
+///         One shall not use this MACRO. Internally called by other assert macros
+///
+/// \param[in] test_suite The name of the test_suite where the check is done
+/// \param[in] test_case The name of the test_case where the check is done
+/// \param[in] expr The expression to be tested for trueness
+/// \param[in] message The message to print in case of failed test
+///
+#define MCU_ASSERT_BASE(test_suite, test_case, expr, message)                            \
+    do {                                                              \
+        *nb_tests+=1;                                                 \
+        if ( !(expr) ) {                                \
+            *nb_failed+=1;                                              \
+            MCU_LOG_BASE(__FILENAME__, test_suite, test_case, __LINE__, message);  \
+        }                                                             \
+    } while (0)
+
+
+
+#define mcu_log(message) \
+    LOG_FUNCTION("%s\n", message)
+
+#define mcu_assert_true(expr) \
+    MCU_ASSERT_BASE(test_suite, __func__, (expr), "\""#expr" is not true\"")
+
+
+#define mcu_assert_false(expr) \
+    MCU_ASSERT_BASE(test_suite, __func__, !(expr), "\""#expr" is true\"")
+
+#define mcu_assert(expr) \
+    mcu_assert_true(expr)
+
+#define mcu_assert_message(expr, message) \
+    MCU_ASSERT_BASE(test_suite, __func__, (expr), message)
+
+
+
+
+///
+/// \brief Print the expected and obtained values based on printf formatting
+///
+/// \param[in] type The formatting type of the variables to print
+/// \param[in] data Variable obtained in the assert test
+/// \param[in] expected Variable expected for the assert test
+///
+#define MCU_LOG_VALUES(type, data, expected) \
+    do { \
+        if (VERBOSITY) \
+        { \
+            LOG_FUNCTION("Expected "#type" , obtained "#type"\n", expected, data); \
+        } \
+    } while (0)
+
+
+///
+/// \brief Print the compared int variables by assert_equal_int
+///
+/// \param[in] data Int variable obtained in the assert test
+/// \param[in] expected Int variable expected for the assert test
+///
+#define MCU_LOG_VALUES_INT(data, expected) \
+    MCU_LOG_VALUES(%i, data, expected);
+
+
+
+#define MCU_ASSERT_EQUAL_BASE(test_suite, test_case, data, expected, message)                            \
+    do { \
+        MCU_ASSERT_BASE(test_suite, test_case, (data == expected), message); \
+    } while (0)
+
+
+
+#define mcu_assert_equal_int(data, expected) \
+    do { \
+        size_t nb_failed_before = *nb_failed; \
+        MCU_ASSERT_EQUAL_BASE(test_suite, __func__, data, expected, "\""#data" == "#expected"\""); \
+        if (*nb_failed - nb_failed_before == 1) \
+        { \
+            MCU_LOG_VALUES_INT(data, expected); \
+        } \
+    } while (0)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 ///
@@ -130,7 +203,7 @@ static char group_report[500000]; // should be long enough to hold full report
         *nb_tests+=1;                                                 \
         if ( (data) != (expected) ) {                                \
             *nb_failed+=1;                                              \
-            ASSERT_LOG(__FILENAME__, test_suite, test_case, __LINE__, message);  \
+            MCU_LOG_BASE(__FILENAME__, test_suite, test_case, __LINE__, message);  \
             ASSERT_LOG_VALUES_INT(data, expected); \
         }                                                             \
     } while (0)
@@ -174,7 +247,7 @@ static char group_report[500000]; // should be long enough to hold full report
         *nb_tests+=1;                                                 \
         if (!((cmp_function)((data), (expected)))) {                                \
             *nb_failed+=1;                                              \
-            ASSERT_LOG(__FILENAME__, test_suite, test_case, __LINE__, message);  \
+            MCU_LOG_BASE(__FILENAME__, test_suite, test_case, __LINE__, message);  \
         }                                                             \
     } while (0)
 
@@ -219,7 +292,7 @@ static char group_report[500000]; // should be long enough to hold full report
         *nb_tests+=1;                                                 \
         if (!((cmp_function)((data), (expected), size))) {                                \
             *nb_failed+=1;                                              \
-            ASSERT_LOG(__FILENAME__, test_suite, test_case, __LINE__, message);  \
+            MCU_LOG_BASE(__FILENAME__, test_suite, test_case, __LINE__, message);  \
         }                                                             \
     } while (0)
 
@@ -250,6 +323,25 @@ static char group_report[500000]; // should be long enough to hold full report
 ///
 #define ASSERT_EQUAL_CUSTOM_CMP_ARRAY_MESSAGE(cmp_function, data, expected, size, message)                            \
     ASSERT_EQUAL_CUSTOM_CMP_ARRAY_BASE(test_suite, __func__, cmp_function, data, expected, size, message)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 ///
 /// \brief Initial definition of a test case.

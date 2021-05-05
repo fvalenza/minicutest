@@ -12,12 +12,6 @@ TODOLISt
 List of asserts to do:
 ---
 
-- MCU_LOG
-
-- MCU_ASSERT(expr) -> if ((expr))
-- MCU_ASSERT_TRUE -> 
-- MCU_ASSERT_FALSE ->
-- 
 - MCU_ASSERT_PTR_NULL
 - MCU_ASSERT_PTR_NOT_NULL
 
