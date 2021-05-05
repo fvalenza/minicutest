@@ -25,6 +25,7 @@
 #define __MINICUTEST_H__
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
 
@@ -52,6 +53,38 @@
 /// \brief Array of char to store log report of TEST_GROUP
 ///
 static char group_report[500000]; // should be long enough to hold full report
+
+
+#define MCU_ASSERT_BASE(test_suite, test_case, expr, message)                            \
+    do {                                                              \
+        *nb_tests+=1;                                                 \
+        if ( !(expr) ) {                                \
+            *nb_failed+=1;                                              \
+            ASSERT_LOG(__FILENAME__, test_suite, test_case, __LINE__, message);  \
+        }                                                             \
+    } while (0)
+
+
+#define mcu_assert(expr, message) \
+    MCU_ASSERT_BASE(test_suite, __func__, (expr), "\""#expr" is not true\"");
+
+
+#define mcu_assert_true(expr) \
+    MCU_ASSERT_BASE(test_suite, __func__, (expr), "\""#expr" is not true\"");
+
+
+#define mcu_assert_false(expr) \
+    MCU_ASSERT_BASE(test_suite, __func__, !(expr), "\""#expr" is true\"");
+
+// #define assert_true(expr) do { \
+//     ASSERT_BASE(test_suite, __func__, expr, "\""#expr" not true"); \
+//     *nb_tests+=1;                                                 \
+//     if ( !(expr) ) {                                \
+//         *nb_failed+=1;                                              \
+//         ASSERT_LOG(__FILENAME__, test_suite, test_case, __LINE__, message);  \
+//     }  \
+// } while (0)
+
 
 ///
 /// \brief Basic print/log function.
@@ -226,10 +259,10 @@ static char group_report[500000]; // should be long enough to hold full report
 /// \param[in] name shortname of the test_case
 ///
 #define TEST_CASE_BEGIN(name) \
-    void test_case_##name(const char* const test_suite, uint32_t* nb_tests, uint32_t* nb_failed) \
+    void test_case_##name(const char* const test_suite, size_t* nb_tests, size_t* nb_failed) \
     { \
-        uint32_t start_nb_tests = *nb_tests;        \
-        uint32_t start_nb_failed = *nb_failed;      \
+        size_t start_nb_tests = *nb_tests;        \
+        size_t start_nb_failed = *nb_failed;      \
         LOG_FUNCTION("TEST CASE %s...\n", ""#name"");  \
         LOG_FUNCTION("---\n");
 
@@ -239,18 +272,18 @@ static char group_report[500000]; // should be long enough to hold full report
 ///
 ///
 #define TEST_CASE_END() \
-        uint32_t nb_test_tc = *nb_tests - start_nb_tests; \
-        uint32_t nb_test_tc_failed = *nb_failed - start_nb_failed; \
-        uint32_t nb_test_tc_passed = nb_test_tc - nb_test_tc_failed; \
+        size_t nb_test_tc = *nb_tests - start_nb_tests; \
+        size_t nb_test_tc_failed = *nb_failed - start_nb_failed; \
+        size_t nb_test_tc_passed = nb_test_tc - nb_test_tc_failed; \
         \
         if (nb_test_tc_failed > 0)    \
         {   \
-            LOG_FUNCTION("--- KO - %u tests : %u passed, %u failed ---\n", nb_test_tc, nb_test_tc_passed, nb_test_tc_failed); \
+            LOG_FUNCTION("--- KO - %lu tests : %lu passed, %lu failed ---\n", nb_test_tc, nb_test_tc_passed, nb_test_tc_failed); \
             LOG_FUNCTION("\n"); \
         }   \
         else    \
         {   \
-            LOG_FUNCTION("--- OK - %u passed ---\n", nb_test_tc_passed); \
+            LOG_FUNCTION("--- OK - %lu passed ---\n", nb_test_tc_passed); \
             LOG_FUNCTION("\n"); \
         }   \
     }
@@ -291,8 +324,8 @@ static char group_report[500000]; // should be long enough to hold full report
 #define TEST_SUITE_BEGIN(name) \
     const char* test_suite_##name() \
     { \
-        uint32_t nbr_tests = 0; \
-        uint32_t nbr_failed = 0;    \
+        size_t nbr_tests = 0; \
+        size_t nbr_failed = 0;    \
         LOG_FUNCTION("TEST SUITE %s \n", ""#name"");   \
         LOG_FUNCTION("===========================================================\n");
 
@@ -305,12 +338,12 @@ static char group_report[500000]; // should be long enough to hold full report
 #define TEST_SUITE_END() \
         if(nbr_failed != 0) \
         { \
-            LOG_FUNCTION("================ KO - %u tests :  %u passed, %u failed =================\n\n", nbr_tests, nbr_tests - nbr_failed, nbr_failed); \
+            LOG_FUNCTION("================ KO - %lu tests :  %lu passed, %lu failed =================\n\n", nbr_tests, nbr_tests - nbr_failed, nbr_failed); \
             return "KO"; \
         } \
         else \
         { \
-            LOG_FUNCTION("================ OK -  %u passed =================\n\n", nbr_tests); \
+            LOG_FUNCTION("================ OK -  %lu passed =================\n\n", nbr_tests); \
             return "OK"; \
         } \
     }

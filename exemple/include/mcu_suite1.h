@@ -1,6 +1,8 @@
 #ifndef MCU_SUITE1_H
 #define MCU_SUITE1_H
 
-void mcu_hello();
+#include <minicutest.h>
+
+EXTERNAL_DECLARE_TEST_SUITE(mcu_suite1);
 
 #endif // MCU_SUITE1_H

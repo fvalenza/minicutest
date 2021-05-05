@@ -1,10 +1,11 @@
 #include <stdio.h>
-#include <mcu_suite1.h>
+
 #include <minicutest.h>
+#include <mcu_suite1.h>
 
 int main() {
 
-	mcu_hello();
-	
+	TEST_SUITE_RUN(mcu_suite1);
+
 	return(0);
 }
