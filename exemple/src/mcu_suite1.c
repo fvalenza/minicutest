@@ -33,11 +33,41 @@ TEST_CASE_END()
 
 TEST_CASE_BEGIN(tc4)
 	mcu_assert_equal_int(1,2);
+	mcu_assert_not_equal_int(2,2);
+	mcu_assert_equal_char('a','b');
+	mcu_assert_equal_char('a','b');
+	int toto1, toto2;
+	int* ptoto1 = &toto1;
+	int* ptoto2 = &toto2; 
+	mcu_assert_equal_ptr(ptoto1, ptoto2);
+	mcu_assert_null_ptr(ptoto1);
+	ptoto1 = NULL;
+	mcu_assert_null_ptr(ptoto1);
+
 TEST_CASE_END()
+
+typedef struct
+{
+	int a;
+	int b;
+} point2D;
+
+int equal_2d_points(const point2D a, const point2D b)
+{
+	return ((a.a == b.a) && (a.b == b.b));
+}
+
+TEST_CASE_BEGIN(tc5)
+	point2D pa = {1, 2};
+	point2D pb = {3, 4};
+	mcu_assert_equal_custom_cmp(equal_2d_points, pa, pb);
+TEST_CASE_END()
+
 
 TEST_SUITE_BEGIN(mcu_suite1)
 	TEST_CASE_RUN(tc1);
 	TEST_CASE_RUN(tc2);
 	TEST_CASE_RUN(tc3);
 	TEST_CASE_RUN(tc4);
+	TEST_CASE_RUN(tc5);
 TEST_SUITE_END()

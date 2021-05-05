@@ -2,18 +2,28 @@ TODOLISt
 ---
 
 - Add before/after test_case functions ?? Or let user do it ?
-- Naming_convention : MCU_ASSERT_EQUAL_[TYPE][SIZE][_ARRAY][_BASE]
-- Add all base assert types
-- Add exemples
 - Rework verbosity ?
 - Add boolean ? With user defined boolean macros ??
 
+- Naming_convention : MCU_ASSERT_EQUAL_[TYPE][SIZE][_ARRAY][_BASE]
+- Add exemples
 
-List of asserts to do:
----
 
-- MCU_ASSERT_PTR_NULL
-- MCU_ASSERT_PTR_NOT_NULL
+
+// User defined macros for int16, int32 etc... as it is platform dependent. Shall be a custom .h file that includes minicutest.h. 
+
+
+TODO URGENT
+// add for float/double (with precision, and not useing asssert_equal_base_type)    
+// add string ?
+// add array base types( 1 ERROR for report but count number of fails in forloop ?) --> Assertion failed : toto == titi : x fails over y values
+// add array custom_cmp
+// Examples au propre
+// Cleaning minicutest une fois tout fini. Check naming_convention + semicolon (lower/upper case)
+// Readme
+// Push
+
+
 
 
 # 	macro that must end with semicolon shall be lowercasae.

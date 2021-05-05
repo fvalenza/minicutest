@@ -125,6 +125,125 @@ static char group_report[500000]; // should be long enough to hold full report
     } while (0)
 
 
+
+#define MCU_ASSERT_EQUAL_BASE(test_suite, test_case, data, expected, message)                            \
+    do { \
+        MCU_ASSERT_BASE(test_suite, test_case, (data == expected), message); \
+    } while (0)
+
+#define MCU_ASSERT_NOT_EQUAL_BASE(test_suite, test_case, data, expected, message)                            \
+    do { \
+        MCU_ASSERT_BASE(test_suite, test_case, (!(data == expected)), message); \
+    } while (0)
+
+
+#define MCU_ASSERT_EQUAL_BASE_TYPE(TYPE, data, expected)                            \
+    do { \
+        size_t nb_failed_before = *nb_failed; \
+        MCU_ASSERT_EQUAL_BASE(test_suite, __func__, data, expected, "\""#data" == "#expected"\""); \
+        if (*nb_failed - nb_failed_before == 1) \
+        { \
+            MCU_LOG_VALUES_##TYPE(data, expected); \
+        } \
+    } while (0)
+
+
+#define MCU_ASSERT_NOT_EQUAL_BASE_TYPE(TYPE, data, expected)                            \
+    do { \
+        size_t nb_failed_before = *nb_failed; \
+        MCU_ASSERT_NOT_EQUAL_BASE(test_suite, __func__, data, expected, "\""#data" != "#expected"\""); \
+        if (*nb_failed - nb_failed_before == 1) \
+        { \
+            MCU_LOG_VALUES_##TYPE(data, expected); \
+        } \
+    } while (0)
+
+
+
+
+
+///
+/// \brief Check if two variables are "equal" ( based on custom comparison function)
+///         Shall be used inside a TEST_CASE. Abstraction of BASE macro
+///
+/// \param[in] cmp_function Hookup function which does the comparison of data and expected variables
+/// \param[in] data The first variable for comparison
+/// \param[in] expected The second variable for comparison
+///
+#define mcu_assert_equal_custom_cmp(cmp_function, data, expected) \
+    MCU_ASSERT_BASE(test_suite, __func__, ((cmp_function)((data), (expected))), "\""#data" == "#expected"\"")
+
+
+///
+/// \brief Check if two variables are "equal" ( based on custom comparison function)
+///         Print custom message if assert fails
+///         Shall be used inside a TEST_CASE. Abstraction of BASE macro
+///
+/// \param[in] cmp_function Hookup function which does the comparison of data and expected variables
+/// \param[in] data The first variable for comparison
+/// \param[in] expected The second variable for comparison
+/// \param[in] message The message to print in case of failed test
+///
+#define mcu_assert_equal_custom_cmp_messagae(cmp_function, data, expected, message) \
+    MCU_ASSERT_BASE(test_suite, __func__, ((cmp_function)((data), (expected))), message)
+
+
+
+
+///
+/// \brief Print the compared int variables by assert_equal_int
+///
+/// \param[in] data Int variable obtained in the assert test
+/// \param[in] expected Int variable expected for the assert test
+///
+#define MCU_LOG_VALUES_CHAR(data, expected) \
+    MCU_LOG_VALUES(%c, data, expected);
+
+#define mcu_assert_equal_char(data, expected) \
+    MCU_ASSERT_EQUAL_BASE_TYPE(CHAR, data, expected);
+
+#define mcu_assert_not_equal_char(data, expected) \
+    MCU_ASSERT_NOT_EQUAL_BASE_TYPE(CHAR, data, expected);
+
+
+
+
+
+
+#define MCU_LOG_VALUES_UCHAR(data, expected) \
+    MCU_LOG_VALUES(%c, data, expected);
+
+#define mcu_assert_equal_uchar(data, expected) \
+    MCU_ASSERT_EQUAL_BASE_TYPE(UCHAR, data, expected);
+
+#define mcu_assert_not_equal_uchar(data, expected) \
+    MCU_ASSERT_NOT_EQUAL_BASE_TYPE(UCHAR, data, expected);
+
+
+
+
+#define MCU_LOG_VALUES_SHORT(data, expected) \
+    MCU_LOG_VALUES(%i, data, expected);
+
+#define mcu_assert_equal_short(data, expected) \
+    MCU_ASSERT_EQUAL_BASE_TYPE(SHORT, data, expected);
+
+#define mcu_assert_not_equal_short(data, expected) \
+    MCU_ASSERT_NOT_EQUAL_BASE_TYPE(SHORT, data, expected);
+
+
+
+#define MCU_LOG_VALUES_USHORT(data, expected) \
+    MCU_LOG_VALUES(%u, data, expected);
+
+#define mcu_assert_equal_ushort(data, expected) \
+    MCU_ASSERT_EQUAL_BASE_TYPE(USHORT, data, expected);
+
+#define mcu_assert_not_equal_ushort(data, expected) \
+    MCU_ASSERT_NOT_EQUAL_BASE_TYPE(USHORT, data, expected);
+
+
+
 ///
 /// \brief Print the compared int variables by assert_equal_int
 ///
@@ -134,24 +253,103 @@ static char group_report[500000]; // should be long enough to hold full report
 #define MCU_LOG_VALUES_INT(data, expected) \
     MCU_LOG_VALUES(%i, data, expected);
 
-
-
-#define MCU_ASSERT_EQUAL_BASE(test_suite, test_case, data, expected, message)                            \
-    do { \
-        MCU_ASSERT_BASE(test_suite, test_case, (data == expected), message); \
-    } while (0)
-
-
-
 #define mcu_assert_equal_int(data, expected) \
-    do { \
-        size_t nb_failed_before = *nb_failed; \
-        MCU_ASSERT_EQUAL_BASE(test_suite, __func__, data, expected, "\""#data" == "#expected"\""); \
-        if (*nb_failed - nb_failed_before == 1) \
-        { \
-            MCU_LOG_VALUES_INT(data, expected); \
-        } \
-    } while (0)
+    MCU_ASSERT_EQUAL_BASE_TYPE(INT, data, expected);
+
+#define mcu_assert_not_equal_int(data, expected) \
+    MCU_ASSERT_NOT_EQUAL_BASE_TYPE(INT, data, expected);
+
+
+
+
+#define MCU_LOG_VALUES_UINT(data, expected) \
+    MCU_LOG_VALUES(%u, data, expected);
+
+#define mcu_assert_equal_uint(data, expected) \
+    MCU_ASSERT_EQUAL_BASE_TYPE(UINT, data, expected);
+
+#define mcu_assert_not_equal_uint(data, expected) \
+    MCU_ASSERT_NOT_EQUAL_BASE_TYPE(UINT, data, expected);
+
+
+
+#define MCU_LOG_VALUES_LONG(data, expected) \
+    MCU_LOG_VALUES(%li, data, expected);
+
+#define mcu_assert_equal_long(data, expected) \
+    MCU_ASSERT_EQUAL_BASE_TYPE(LONG, data, expected);
+
+#define mcu_assert_not_equal_long(data, expected) \
+    MCU_ASSERT_NOT_EQUAL_BASE_TYPE(LONG, data, expected);
+
+
+
+#define MCU_LOG_VALUES_ULONG(data, expected) \
+    MCU_LOG_VALUES(%lu, data, expected);
+
+#define mcu_assert_equal_ulong(data, expected) \
+    MCU_ASSERT_EQUAL_BASE_TYPE(ULONG, data, expected);
+
+#define mcu_assert_not_equal_ulong(data, expected) \
+    MCU_ASSERT_NOT_EQUAL_BASE_TYPE(ULONG, data, expected);
+
+
+#define MCU_LOG_VALUES_ULONG(data, expected) \
+    MCU_LOG_VALUES(%lu, data, expected);
+
+#define mcu_assert_equal_ulong(data, expected) \
+    MCU_ASSERT_EQUAL_BASE_TYPE(ULONG, data, expected);
+
+#define mcu_assert_not_equal_ulong(data, expected) \
+    MCU_ASSERT_NOT_EQUAL_BASE_TYPE(ULONG, data, expected);
+
+
+#define MCU_LOG_VALUES_LLONG(data, expected) \
+    MCU_LOG_VALUES(%lli, data, expected);
+
+#define mcu_assert_equal_llong(data, expected) \
+    MCU_ASSERT_EQUAL_BASE_TYPE(LLONG, data, expected);
+
+#define mcu_assert_not_equal_llong(data, expected) \
+    MCU_ASSERT_NOT_EQUAL_BASE_TYPE(LLONG, data, expected);
+
+
+#define MCU_LOG_VALUES_ULLONG(data, expected) \
+    MCU_LOG_VALUES(%llu, data, expected);
+
+#define mcu_assert_equal_ullong(data, expected) \
+    MCU_ASSERT_EQUAL_BASE_TYPE(ULLONG, data, expected);
+
+#define mcu_assert_not_equal_ullong(data, expected) \
+    MCU_ASSERT_NOT_EQUAL_BASE_TYPE(ULLONG, data, expected);
+
+
+#define MCU_LOG_VALUES_SIZE_T(data, expected) \
+    MCU_LOG_VALUES_ULONG(data, expected);
+
+#define mcu_assert_equal_size_t(data, expected) \
+    mcu_assert_equal_ulong(data, expected);
+
+#define mcu_assert_not_equal_size_t(data, expected) \
+    mcu_assert_not_equal_ulong(data, expected);
+
+
+
+
+#define MCU_LOG_VALUES_PTR(data, expected) \
+    MCU_LOG_VALUES(%p, data, expected);
+
+#define mcu_assert_equal_ptr(data, expected) \
+    MCU_ASSERT_EQUAL_BASE_TYPE(PTR, data, expected);
+
+#define mcu_assert_not_equal_ptr(data, expected) \
+    MCU_ASSERT_NOT_EQUAL_BASE_TYPE(PTR, data, expected);
+
+#define mcu_assert_null_ptr(ptr) \
+    MCU_ASSERT_EQUAL_BASE_TYPE(PTR, ptr, NULL);
+
+#define mcu_assert_not_null_ptr(ptr) \
+    MCU_ASSERT_NOT_EQUAL_BASE_TYPE(PTR, ptr, NULL);
 
 
 
@@ -171,109 +369,6 @@ static char group_report[500000]; // should be long enough to hold full report
 
 
 
-
-
-///
-/// \brief Print the compared int variables by assert_equal_int
-///
-/// \param[in] data Int variable obtained in the assert test
-/// \param[in] expected Int variable expected for the assert test
-///
-#define ASSERT_LOG_VALUES_INT(data, expected) \
-    do { \
-        if (VERBOSITY) \
-        { \
-            LOG_FUNCTION("Expected %i , obtained %i\n", expected, data); \
-        } \
-    } while (0)
-
-
-///
-/// \brief Check within a test_case of a test_suite if two integers are equal
-///         One shall not use this MACRO. Internally called by ASSERT_EQUAL_INT
-///
-/// \param[in] test_suite The name of the test_suite where the check is done
-/// \param[in] test_case The name of the test_case where the check is done
-/// \param[in] data The first integer for comparison
-/// \param[in] expected The second integer for comparison
-/// \param[in] message The message to print in case of failed test
-///
-#define ASSERT_EQUAL_INT_BASE(test_suite, test_case, data, expected, message)                            \
-    do {                                                              \
-        *nb_tests+=1;                                                 \
-        if ( (data) != (expected) ) {                                \
-            *nb_failed+=1;                                              \
-            MCU_LOG_BASE(__FILENAME__, test_suite, test_case, __LINE__, message);  \
-            ASSERT_LOG_VALUES_INT(data, expected); \
-        }                                                             \
-    } while (0)
-
-///
-/// \brief Check within a test_case of a test_suite if two integers are equal
-///         Shall be used inside a TEST_CASE. Abstraction of BASE macro
-///
-/// \param[in] data The first integer for comparison
-/// \param[in] expected The second integer for comparison
-///
-#define ASSERT_EQUAL_INT(data, expected) \
-    ASSERT_EQUAL_INT_BASE(test_suite, __func__, data, expected, "\""#data" == "#expected"\"")
-
-///
-/// \brief Check within a test_case of a test_suite if two integers are equal
-///         Print custom message if assert fails
-///         Shall be used inside a TEST_CASE. Abstraction of BASE macro
-///
-/// \param[in] data The first integer for comparison
-/// \param[in] expected The second integer for comparison
-/// \param[in] message The message to print in case of failed test
-///
-#define ASSERT_EQUAL_INT_MESSAGE(data, expected, message) \
-    ASSERT_EQUAL_INT_BASE(test_suite, __func__, data, expected, message)
-
-
-///
-/// \brief Check within a test_case of a test_suite if two variables are "equal" ( based on custom comparison function)
-///         One shall not use this MACRO. Internally called by ASSERT_EQUAL_CUSTOM_CMP
-///
-/// \param[in] test_suite The name of the test_suite where the check is done
-/// \param[in] test_case The name of the test_case where the check is done
-/// \param[in] cmp_function Hookup function which does the comparison of data and expected variables. Should return C-True like if cmp equal
-/// \param[in] data The first variable for comparison
-/// \param[in] expected The second variable for comparison
-/// \param[in] message The message to print in case of failed test
-///
-#define ASSERT_EQUAL_CUSTOM_CMP_BASE(test_suite, test_case, cmp_function, data, expected, message)                            \
-    do {                                                              \
-        *nb_tests+=1;                                                 \
-        if (!((cmp_function)((data), (expected)))) {                                \
-            *nb_failed+=1;                                              \
-            MCU_LOG_BASE(__FILENAME__, test_suite, test_case, __LINE__, message);  \
-        }                                                             \
-    } while (0)
-
-///
-/// \brief Check if two variables are "equal" ( based on custom comparison function)
-///         Shall be used inside a TEST_CASE. Abstraction of BASE macro
-///
-/// \param[in] cmp_function Hookup function which does the comparison of data and expected variables
-/// \param[in] data The first variable for comparison
-/// \param[in] expected The second variable for comparison
-///
-#define ASSERT_EQUAL_CUSTOM_CMP(cmp_function, data, expected) \
-    ASSERT_EQUAL_CUSTOM_CMP_BASE(test_suite, __func__, cmp_function, data, expected, "\""#data" == "#expected"\"")
-
-///
-/// \brief Check if two variables are "equal" ( based on custom comparison function)
-///         Print custom message if assert fails
-///         Shall be used inside a TEST_CASE. Abstraction of BASE macro
-///
-/// \param[in] cmp_function Hookup function which does the comparison of data and expected variables
-/// \param[in] data The first variable for comparison
-/// \param[in] expected The second variable for comparison
-/// \param[in] message The message to print in case of failed test
-///
-#define ASSERT_EQUAL_CUSTOM_CMP_MESSAGE(cmp_function, data, expected, message) \
-    ASSERT_EQUAL_CUSTOM_CMP_BASE(test_suite, __func__, cmp_function, data, expected, message)
 
 ///
 /// \brief Check within a test_case of a test_suite if two array are "equal" ( based on custom comparison function)
