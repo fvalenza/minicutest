@@ -63,6 +63,21 @@ TEST_CASE_BEGIN(tc5)
 	mcu_assert_equal_custom_cmp(equal_2d_points, pa, pb);
 TEST_CASE_END()
 
+TEST_CASE_BEGIN(tc6)
+	float f1 = 1.3;
+	float f2 = 1.4;
+	float f3 = 1.401;
+	mcu_assert_equal_float(f1, f2, 1e-2);
+	mcu_assert_equal_float(f1, f2, 1);
+	mcu_assert_equal_float(f3, f2, 1e-2);
+
+	double d1 = 1525681.4056;
+	double d2 = 1525681.4055;
+	double d3 = 1525681.401;
+	mcu_assert_equal_double(d1, d2, 1e-4);
+	mcu_assert_equal_double(d1, d2, 1e-3);
+	mcu_assert_equal_double(d3, d2, 1e-3);
+TEST_CASE_END()
 
 TEST_SUITE_BEGIN(mcu_suite1)
 	TEST_CASE_RUN(tc1);
@@ -70,4 +85,5 @@ TEST_SUITE_BEGIN(mcu_suite1)
 	TEST_CASE_RUN(tc3);
 	TEST_CASE_RUN(tc4);
 	TEST_CASE_RUN(tc5);
+	TEST_CASE_RUN(tc6);
 TEST_SUITE_END()

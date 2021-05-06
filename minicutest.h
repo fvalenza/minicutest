@@ -32,6 +32,8 @@
 // For usage of do{} while(0) with NO semicolon at the end of the macro (hence user shall put semicolon after each macro call)
 // see http://c-faq.com/cpp/multistmt.html
 
+// for print formating : https://fr.wikipedia.org/wiki/Types_de_donn%C3%A9e_du_langage_C
+
 
 #ifndef CUSTOM_PRINT_METHOD
 #define LOG_FUNCTION printf
@@ -159,8 +161,83 @@ static char group_report[500000]; // should be long enough to hold full report
     } while (0)
 
 
+#define MCU_ASSERT_EQUAL_FLOATING_BASE(test_suite, test_case, float_diff, precision, message)                            \
+    do { \
+        MCU_ASSERT_BASE(test_suite, test_case, (float_diff <= precision), message); \
+    } while (0)
+
+#define MCU_ASSERT_NOT_EQUAL_FLOATING_BASE(test_suite, test_case, float_diff, precision, message)                            \
+    do { \
+        MCU_ASSERT_BASE(test_suite, test_case, (float_diff > precision), message); \
+    } while (0)
 
 
+#define MCU_LOG_VALUES_FLOAT(data, expected) \
+    MCU_LOG_VALUES(%f, data, expected);
+
+#define MCU_LOG_VALUES_DOUBLE(data, expected) \
+    MCU_LOG_VALUES(%lf, data, expected);
+
+
+#define MCU_ASSERT_EQUAL_FLOAT(data, expected, precision) \
+    do { \
+        const float float_diff = ((data - expected) < 0) ? -(data - expected) : (data - expected); \
+        size_t nb_failed_before = *nb_failed; \
+        MCU_ASSERT_EQUAL_FLOATING_BASE(test_suite, __func__, float_diff, precision, "\""#data" == "#expected"\""); \
+        if (*nb_failed - nb_failed_before == 1) \
+        { \
+            MCU_LOG_VALUES_FLOAT(data, expected); \
+        } \
+    } while (0)
+
+#define MCU_ASSERT_NOT_EQUAL_FLOAT(data, expected, precision) \
+    do { \
+        const float float_diff = ((data - expected) < 0) ? -(data - expected) : (data - expected); \
+        size_t nb_failed_before = *nb_failed; \
+        MCU_ASSERT_NOT_EQUAL_FLOATING_BASE(test_suite, __func__, float_diff, precision, "\""#data" == "#expected"\""); \
+        if (*nb_failed - nb_failed_before == 1) \
+        { \
+            MCU_LOG_VALUES_FLOAT(data, expected); \
+        } \
+    } while (0)
+
+#define MCU_ASSERT_EQUAL_DOUBLE(data, expected, precision) \
+    do { \
+        const double double_diff = ((data - expected) < 0) ? -(data - expected) : (data - expected); \
+        size_t nb_failed_before = *nb_failed; \
+        MCU_ASSERT_EQUAL_FLOATING_BASE(test_suite, __func__, double_diff, precision, "\""#data" != "#expected"\""); \
+        if (*nb_failed - nb_failed_before == 1) \
+        { \
+            MCU_LOG_VALUES_DOUBLE(data, expected); \
+        } \
+    } while (0)
+
+#define MCU_ASSERT_NOT_EQUAL_DOUBLE(data, expected, precision) \
+    do { \
+        const double double_diff = ((data - expected) < 0) ? -(data - expected) : (data - expected); \
+        size_t nb_failed_before = *nb_failed; \
+        MCU_ASSERT_NOT_EQUAL_FLOATING_BASE(test_suite, __func__, double_diff, precision, "\""#data" != "#expected"\""); \
+        if (*nb_failed - nb_failed_before == 1) \
+        { \
+            MCU_LOG_VALUES_DOUBLE(data, expected); \
+        } \
+    } while (0)
+
+
+#define mcu_assert_equal_float(data, expected, precision) \
+    MCU_ASSERT_EQUAL_FLOAT(data, expected, precision)
+
+// expects the relative_precision expressed in %
+#define mcu_assert_equal_float_rel(data, expected, rel_precision) \
+    MCU_ASSERT_EQUAL_FLOAT(data, expected, (rel_precision * expected))
+
+
+#define mcu_assert_equal_double(data, expected, precision) \
+    MCU_ASSERT_EQUAL_DOUBLE(data, expected, precision)
+
+// expects the relative_precision expressed in %
+#define mcu_assert_equal_double_rel(data, expected, rel_precision) \
+    MCU_ASSERT_EQUAL_DOUBLE(data, expected, (rel_precision * expected))
 
 ///
 /// \brief Check if two variables are "equal" ( based on custom comparison function)

@@ -14,7 +14,6 @@ TODOLISt
 
 
 TODO URGENT
-// add for float/double (with precision, and not useing asssert_equal_base_type)    
 // add string ?
 // add array base types( 1 ERROR for report but count number of fails in forloop ?) --> Assertion failed : toto == titi : x fails over y values
 // add array custom_cmp
