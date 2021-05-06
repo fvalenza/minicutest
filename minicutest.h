@@ -399,6 +399,34 @@ static char group_report[500000]; // should be long enough to hold full report
 
 
 
+#define MCU_ASSERT_EQUAL_ARRAY_BASE(data, expected, expr, size) \
+    do \
+    { \
+        *nb_tests+=1;  \
+        int nb_array_tests_failed = 0; \
+        for (size_t idx = 0; idx < size; ++idx) \
+        { \
+            if (expr) \
+            { \
+                ++nb_array_tests_failed; \
+            } \
+        } \
+        if (nb_array_tests_failed > 0) \
+        { \
+            *nb_failed+=1; \
+            char array_test_results[1024]; \
+            sprintf(array_test_results,  "\""#data" == "#expected"\" : " MAG "%u ko / %u " RESET , nb_array_tests_failed, size); \
+            MCU_LOG_BASE(__FILENAME__, test_suite, __func__, __LINE__, array_test_results);  \
+        } \
+    } while(0)
+
+#define mcu_assert_equal_int_array(data, expected, size) \
+    MCU_ASSERT_EQUAL_ARRAY_BASE(data, expected, !(data[idx] == expected[idx]), size)
+
+#define mcu_assert_equal_custom_cmp_array(cmp_function, data, expected, size) \
+    MCU_ASSERT_EQUAL_ARRAY_BASE(data, expected, !((cmp_function)((data[idx]), (expected[idx]))), size)
+
+
 
 #define MCU_LOG_VALUES_UINT(data, expected) \
     MCU_LOG_VALUES(%u, data, expected);
@@ -488,76 +516,6 @@ static char group_report[500000]; // should be long enough to hold full report
 
 #define mcu_assert_not_null_ptr(ptr) \
     MCU_ASSERT_NOT_EQUAL_BASE_TYPE(PTR, ptr, NULL);
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-///
-/// \brief Check within a test_case of a test_suite if two array are "equal" ( based on custom comparison function)
-///         One shall not use this MACRO. Internally called by ASSERT_EQUAL_CUSTOM_CMP_ARRAY
-///
-/// \param[in] test_suite The name of the test_suite where the check is done
-/// \param[in] test_case The name of the test_case where the check is done
-/// \param[in] cmp_function Hookup function which does the comparison of data and expected variables
-/// \param[in] data The first array for comparison
-/// \param[in] expected The second array for comparison
-/// \param[in] size The length of both arrays
-/// \param[in] message The message to print in case of failed test
-///
-#define ASSERT_EQUAL_CUSTOM_CMP_ARRAY_BASE(test_suite, test_case, cmp_function, data, expected, size, message)                            \
-    do {                                                              \
-        *nb_tests+=1;                                                 \
-        if (!((cmp_function)((data), (expected), size))) {                                \
-            *nb_failed+=1;                                              \
-            MCU_LOG_BASE(__FILENAME__, test_suite, test_case, __LINE__, message);  \
-        }                                                             \
-    } while (0)
-
-
-///
-/// \brief Check if two arrays are "equal" ( based on custom comparison function)
-///         Shall be used inside a TEST_CASE. Abstraction of BASE macro
-///
-/// \param[in] cmp_function Hookup function which does the comparison of data and expected variables
-/// \param[in] data The first array for comparison
-/// \param[in] expected The second array for comparison
-/// \param[in] size The length of both arrays
-///
-#define ASSERT_EQUAL_CUSTOM_CMP_ARRAY(cmp_function, data, expected, size)                            \
-    ASSERT_EQUAL_CUSTOM_CMP_ARRAY_BASE(test_suite, __func__, cmp_function, data, expected, size, "\""#data" == "#expected"\"")
-
-
-///
-/// \brief Check if two arrays are "equal" ( based on custom comparison function)
-///         Print custom message if assert fails
-///         Shall be used inside a TEST_CASE. Abstraction of BASE macro
-///
-/// \param[in] cmp_function Hookup function which does the comparison of data and expected variables
-/// \param[in] data The first array for comparison
-/// \param[in] expected The second array for comparison
-/// \param[in] size The length of both arrays
-/// \param[in] message The message to print in case of failed test
-///
-#define ASSERT_EQUAL_CUSTOM_CMP_ARRAY_MESSAGE(cmp_function, data, expected, size, message)                            \
-    ASSERT_EQUAL_CUSTOM_CMP_ARRAY_BASE(test_suite, __func__, cmp_function, data, expected, size, message)
-
-
 
 
 
@@ -696,7 +654,7 @@ static char group_report[500000]; // should be long enough to hold full report
     do { \
         strcat(group_report, ""#name""); \
         strcat(group_report, "..."); \
-        if (TEST_SUITE_RUN_OUT_OF_GROUP(name) == TEST_PASSED) \
+        if ( strcmp(TEST_SUITE_RUN_OUT_OF_GROUP(name), TEST_PASSED) == 0 ) \
         { \
             strcat(group_report, GRN); \
             strcat(group_report, TEST_PASSED); \

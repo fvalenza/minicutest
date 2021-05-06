@@ -4,10 +4,6 @@
 #include <mcu_suite1.h>
 #include <stdio.h>
 
-static void mcu_hello()
-{
-	printf("Hello world\n");
-}
 
 TEST_CASE_BEGIN(tc1)
 	mcu_assert_true(1);
@@ -94,6 +90,21 @@ TEST_CASE_BEGIN(tc7)
 
 TEST_CASE_END()
 
+
+TEST_CASE_BEGIN(tc8)
+	int array_int1[5] = {1, 2, 3, 4, 5};
+	int array_int2[5] = {2, 2, 3, 4, 5};
+	int array_int3[5] = {2, 2, 3, 4, 5};
+
+	mcu_assert_equal_int_array(array_int1, array_int2, 5);
+	mcu_assert_equal_int_array(array_int3, array_int2, 5);
+
+	point2D array_p2d_1[2] = {{1, 2},{2,3}};
+	point2D array_p2d_2[2] = {{1,3},{2,3}};
+	mcu_assert_equal_custom_cmp_array(equal_2d_points,array_p2d_1, array_p2d_2, 2);
+
+TEST_CASE_END()
+
 TEST_SUITE_BEGIN(mcu_suite1)
 	TEST_CASE_RUN(tc1);
 	TEST_CASE_RUN(tc2);
@@ -101,4 +112,5 @@ TEST_SUITE_BEGIN(mcu_suite1)
 	TEST_CASE_RUN(tc4);
 	TEST_CASE_RUN(tc5);
 	TEST_CASE_RUN(tc7);
+	TEST_CASE_RUN(tc8);
 TEST_SUITE_END()
