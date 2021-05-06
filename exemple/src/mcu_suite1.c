@@ -60,7 +60,8 @@ int equal_2d_points(const point2D a, const point2D b)
 TEST_CASE_BEGIN(tc5)
 	point2D pa = {1, 2};
 	point2D pb = {3, 4};
-	mcu_assert_equal_custom_cmp(equal_2d_points, pa, pb);
+	// mcu_assert_equal_custom_cmp(equal_2d_points, pa, pb);
+	mcu_assert_not_equal_custom_cmp(equal_2d_points, pa, pb);
 TEST_CASE_END()
 
 TEST_CASE_BEGIN(tc6)
@@ -78,6 +79,9 @@ TEST_CASE_BEGIN(tc6)
 	mcu_assert_equal_double(d1, d2, 1e-3);
 	mcu_assert_equal_double(d3, d2, 1e-3);
 TEST_CASE_END()
+
+
+
 
 TEST_CASE_BEGIN(tc7)
 	const char string1[10] = "Hello";

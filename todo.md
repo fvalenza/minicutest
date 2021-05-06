@@ -20,7 +20,6 @@ TODO URGENT
 // Cleaning minicutest une fois tout fini. Check naming_convention + semicolon (lower/upper case)
 // Readme
 // Push
-// add color in reporting ?
 
 
 

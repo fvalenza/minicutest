@@ -57,6 +57,19 @@
 static char group_report[500000]; // should be long enough to hold full report
 
 
+// For all ANSI colors, see https://gist.github.com/RabaDabaDoba/145049536f815903c79944599c6f952a
+// #define URED   "\x1B[4;31m" --> just add the modifier (here : 4 for underlining)
+#define RED   "\x1B[31m"
+#define GRN   "\x1B[32m"
+#define YEL   "\x1B[33m"
+#define BLU   "\x1B[34m"
+#define MAG   "\x1B[35m"
+#define CYN   "\x1B[36m"
+#define WHT   "\x1B[37m"
+#define RESET "\x1B[0m"
+
+#define TEST_PASSED "PASSED"
+#define TEST_FAILED "FAILED"
 ///
 /// \brief Basic print/log function.
 ///         Builds the message with useful information of where the assert has failed and call LOG_FUNCTION
@@ -122,7 +135,7 @@ static char group_report[500000]; // should be long enough to hold full report
     do { \
         if (VERBOSITY) \
         { \
-            LOG_FUNCTION("Expected "#type" , obtained "#type"\n", expected, data); \
+            LOG_FUNCTION(MAG "Expected " #type " , obtained " #type RESET "\n", expected, data); \
         } \
     } while (0)
 
@@ -297,7 +310,8 @@ static char group_report[500000]; // should be long enough to hold full report
 #define mcu_assert_equal_custom_cmp(cmp_function, data, expected) \
     MCU_ASSERT_BASE(test_suite, __func__, ((cmp_function)((data), (expected))), "\""#data" == "#expected"\"")
 
-
+#define mcu_assert_not_equal_custom_cmp(cmp_function, data, expected) \
+    MCU_ASSERT_BASE(test_suite, __func__, !((cmp_function)((data), (expected))), "\""#data" != "#expected"\"")
 ///
 /// \brief Check if two variables are "equal" ( based on custom comparison function)
 ///         Print custom message if assert fails
@@ -574,8 +588,8 @@ static char group_report[500000]; // should be long enough to hold full report
     { \
         size_t start_nb_tests = *nb_tests;        \
         size_t start_nb_failed = *nb_failed;      \
-        LOG_FUNCTION("TEST CASE %s...\n", ""#name"");  \
-        LOG_FUNCTION("---\n");
+        LOG_FUNCTION(CYN "TEST CASE %s...\n" RESET, ""#name"");  \
+        LOG_FUNCTION(CYN "---\n" RESET);
 
 ///
 /// \brief Finalize the  definition of a test case.
@@ -589,12 +603,12 @@ static char group_report[500000]; // should be long enough to hold full report
         \
         if (nb_test_tc_failed > 0)    \
         {   \
-            LOG_FUNCTION("--- KO - %lu tests : %lu passed, %lu failed ---\n", nb_test_tc, nb_test_tc_passed, nb_test_tc_failed); \
+            LOG_FUNCTION(CYN "--- " RED TEST_FAILED RESET" - %lu tests : %lu passed, %lu failed " CYN "---\n" RESET, nb_test_tc, nb_test_tc_passed, nb_test_tc_failed); \
             LOG_FUNCTION("\n"); \
         }   \
         else    \
         {   \
-            LOG_FUNCTION("--- OK - %lu passed ---\n", nb_test_tc_passed); \
+            LOG_FUNCTION(CYN "--- " GRN TEST_PASSED RESET " - %lu passed " CYN " ---\n" RESET , nb_test_tc_passed); \
             LOG_FUNCTION("\n"); \
         }   \
     }
@@ -637,8 +651,8 @@ static char group_report[500000]; // should be long enough to hold full report
     { \
         size_t nbr_tests = 0; \
         size_t nbr_failed = 0;    \
-        LOG_FUNCTION("TEST SUITE %s \n", ""#name"");   \
-        LOG_FUNCTION("===========================================================\n");
+        LOG_FUNCTION(YEL "TEST SUITE %s \n" RESET, ""#name"");   \
+        LOG_FUNCTION(YEL "===========================================================\n" RESET);
 
 
 ///
@@ -649,13 +663,13 @@ static char group_report[500000]; // should be long enough to hold full report
 #define TEST_SUITE_END() \
         if(nbr_failed != 0) \
         { \
-            LOG_FUNCTION("================ KO - %lu tests :  %lu passed, %lu failed =================\n\n", nbr_tests, nbr_tests - nbr_failed, nbr_failed); \
-            return "KO"; \
+            LOG_FUNCTION( YEL "================ KO - %lu tests :  %lu passed, %lu failed =================\n\n" RESET, nbr_tests, nbr_tests - nbr_failed, nbr_failed); \
+            return TEST_FAILED; \
         } \
         else \
         { \
-            LOG_FUNCTION("================ OK -  %lu passed =================\n\n", nbr_tests); \
-            return "OK"; \
+            LOG_FUNCTION(YEL "================ OK -  %lu passed =================\n\n" RESET, nbr_tests); \
+            return TEST_PASSED; \
         } \
     }
 
@@ -682,7 +696,17 @@ static char group_report[500000]; // should be long enough to hold full report
     do { \
         strcat(group_report, ""#name""); \
         strcat(group_report, "..."); \
-        strcat(group_report, TEST_SUITE_RUN_OUT_OF_GROUP(name)); \
+        if (TEST_SUITE_RUN_OUT_OF_GROUP(name) == TEST_PASSED) \
+        { \
+            strcat(group_report, GRN); \
+            strcat(group_report, TEST_PASSED); \
+        } \
+        else \
+        { \
+            strcat(group_report, RED); \
+            strcat(group_report, TEST_FAILED); \
+        } \
+        strcat(group_report, RESET); \
         strcat(group_report, "\n"); \
     } while (0)
 
