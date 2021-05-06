@@ -14,7 +14,7 @@ TODOLISt
 
 
 TODO URGENT
-// add array base types( 1 ERROR for report but count number of fails in forloop ?) --> Assertion failed : toto == titi : x fails over y values
+// add array base types( 1 ERROR for report but count number of fails in forloop ? need static global counters) --> Assertion failed : toto == titi : x fails over y values
 // add array custom_cmp
 // Examples au propre
 // Cleaning minicutest une fois tout fini. Check naming_convention + semicolon (lower/upper case)
