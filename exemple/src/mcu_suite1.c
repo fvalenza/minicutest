@@ -79,11 +79,22 @@ TEST_CASE_BEGIN(tc6)
 	mcu_assert_equal_double(d3, d2, 1e-3);
 TEST_CASE_END()
 
+TEST_CASE_BEGIN(tc7)
+	const char string1[10] = "Hello";
+	const char string2[10] = "World";
+	const char string3[10] = "World";
+
+	mcu_assert_equal_string(string1, string2);
+	mcu_assert_equal_string(string3, string2);
+	mcu_assert_not_equal_string(string3, string2);
+
+TEST_CASE_END()
+
 TEST_SUITE_BEGIN(mcu_suite1)
 	TEST_CASE_RUN(tc1);
 	TEST_CASE_RUN(tc2);
 	TEST_CASE_RUN(tc3);
 	TEST_CASE_RUN(tc4);
 	TEST_CASE_RUN(tc5);
-	TEST_CASE_RUN(tc6);
+	TEST_CASE_RUN(tc7);
 TEST_SUITE_END()

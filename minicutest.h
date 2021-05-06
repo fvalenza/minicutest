@@ -224,6 +224,53 @@ static char group_report[500000]; // should be long enough to hold full report
     } while (0)
 
 
+
+
+
+#define MCU_ASSERT_EQUAL_STRING_BASE(test_suite, test_case, string_cmp, message)                            \
+    do { \
+        MCU_ASSERT_BASE(test_suite, test_case, (string_cmp), message); \
+    } while (0)
+
+#define MCU_ASSERT_NOT_EQUAL_STRING_BASE(test_suite, test_case, string_cmp, message)                            \
+    do { \
+        MCU_ASSERT_BASE(test_suite, test_case, (!(string_cmp)), message); \
+    } while (0)
+
+
+#define MCU_LOG_VALUES_STRING(data, expected) \
+    MCU_LOG_VALUES(%s, data, expected);
+
+
+
+#define MCU_ASSERT_EQUAL_STRING(data, expected) \
+    do { \
+        size_t nb_failed_before = *nb_failed; \
+        MCU_ASSERT_EQUAL_STRING_BASE(test_suite, __func__, (strcmp(data, expected) == 0), "\""#data" == "#expected"\""); \
+        if (*nb_failed - nb_failed_before == 1) \
+        { \
+            MCU_LOG_VALUES_STRING(data, expected); \
+        } \
+    } while (0)
+
+#define MCU_ASSERT_NOT_EQUAL_STRING(data, expected) \
+    do { \
+        size_t nb_failed_before = *nb_failed; \
+        MCU_ASSERT_NOT_EQUAL_STRING_BASE(test_suite, __func__, (strcmp(data, expected) == 0), "\""#data" != "#expected"\""); \
+        if (*nb_failed - nb_failed_before == 1) \
+        { \
+            MCU_LOG_VALUES_STRING(data, expected); \
+        } \
+    } while (0)
+
+
+#define mcu_assert_equal_string(data, expected) \
+    MCU_ASSERT_EQUAL_STRING(data, expected)
+
+#define mcu_assert_not_equal_string(data, expected) \
+    MCU_ASSERT_NOT_EQUAL_STRING(data, expected)
+
+
 #define mcu_assert_equal_float(data, expected, precision) \
     MCU_ASSERT_EQUAL_FLOAT(data, expected, precision)
 
