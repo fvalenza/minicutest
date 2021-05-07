@@ -3,6 +3,13 @@
 
 #include <minicutest.h>
 
-EXTERNAL_DECLARE_TEST_SUITE(mcu_suite1);
+typedef struct
+{
+	int a;
+	int b;
+} point2D;
+
+
+external_declare_test_suite(mcu_suite1);
 
 #endif // MCU_SUITE1_H

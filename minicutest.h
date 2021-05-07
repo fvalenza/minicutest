@@ -32,8 +32,14 @@
 // For usage of do{} while(0) with NO semicolon at the end of the macro (hence user shall put semicolon after each macro call)
 // see http://c-faq.com/cpp/multistmt.html
 
-// for print formating : https://fr.wikipedia.org/wiki/Types_de_donn%C3%A9e_du_langage_C
+// For print formating : https://fr.wikipedia.org/wiki/Types_de_donn%C3%A9e_du_langage_C
 
+
+////////////////////////////////////////////////////////////////////
+///                                                              ///
+///                   USER REDEFINED BEHAVIOR                    ///
+///                                                              ///
+////////////////////////////////////////////////////////////////////
 
 #ifndef CUSTOM_PRINT_METHOD
 #define LOG_FUNCTION printf
@@ -45,17 +51,15 @@
 #define VERBOSITY_USER (0x0)
 #endif
 
-#define VERBOSITY ( (VERBOSITY_USER & 0x01) )  // TODO :  multiple levels of verbosity ??
-
-//TODO : is it portable ? dependencies to gcc string.h. does this work with pike for example?
-#define __FILENAME__ (strrchr(__FILE__, '/') ? strrchr(__FILE__, '/') + 1 : __FILE__)
+#define VERBOSITY ( (VERBOSITY_USER & 0x01) )
 
 
-///
-/// \brief Array of char to store log report of TEST_GROUP
-///
-static char group_report[500000]; // should be long enough to hold full report
 
+////////////////////////////////////////////////////////////////////
+///                                                              ///
+///                       GLOBAL VARIABLES                       ///
+///                                                              ///
+////////////////////////////////////////////////////////////////////
 
 // For all ANSI colors, see https://gist.github.com/RabaDabaDoba/145049536f815903c79944599c6f952a
 // #define URED   "\x1B[4;31m" --> just add the modifier (here : 4 for underlining)
@@ -71,8 +75,20 @@ static char group_report[500000]; // should be long enough to hold full report
 #define TEST_PASSED "PASSED"
 #define TEST_FAILED "FAILED"
 
-#define DFAULT_EQUL_FAIL_MSG(data, expected) \\""#data" == "#expected"\\"
-#define DFAULT_NOT_EQUL_FAIL_MSG(data, expected) \\""#data" != "#expected"\\"
+
+///
+/// \brief Array of char to store log report of TEST_GROUP
+///
+static char group_report[500000]; // should be long enough to hold full report
+
+
+////////////////////////////////////////////////////////////////////
+///                                                              ///
+///                     REPORTING FUNCTIONS                      ///
+///                                                              ///
+////////////////////////////////////////////////////////////////////
+
+#define __FILENAME__ (strrchr(__FILE__, '/') ? strrchr(__FILE__, '/') + 1 : __FILE__)
 
 ///
 /// \brief Basic print/log function for assert reporting.
@@ -163,6 +179,12 @@ static char group_report[500000]; // should be long enough to hold full report
 
 
 
+////////////////////////////////////////////////////////////////////
+///                                                              ///
+///                    ASSERT functionalities                    ///
+///                                                              ///
+////////////////////////////////////////////////////////////////////
+
 
 
 
@@ -186,6 +208,7 @@ static char group_report[500000]; // should be long enough to hold full report
     } while (0)
 
 
+
 ///
 /// \brief Base macro for testing equality of two variables. For type for which true == is possible
 ///         Prints values in case of error (with the good format for print)
@@ -193,7 +216,7 @@ static char group_report[500000]; // should be long enough to hold full report
 #define MCU_ASSERT_EQUAL_TYPE_BASE(TYPE, data, expected)                            \
     do { \
         size_t nb_failed_before = *nb_failed; \
-        MCU_ASSERT_BASE(test_suite, __func__, (data == expected), "DFAULT_EQUL_FAIL_MSG(data, expected)"); \
+        MCU_ASSERT_BASE(test_suite, __func__, (data == expected), "\""#data" == "#expected"\""); \
         if (*nb_failed - nb_failed_before == 1) \
         { \
             mcu_log_values_##TYPE(data, expected); \
@@ -208,7 +231,7 @@ static char group_report[500000]; // should be long enough to hold full report
 #define MCU_ASSERT_NOT_EQUAL_TYPE_BASE(TYPE, data, expected)                            \
     do { \
         size_t nb_failed_before = *nb_failed; \
-        MCU_ASSERT_BASE(test_suite, __func__, (!(data == expected)), "DFAULT_NOT_EQUL_FAIL_MSG(data, expected)"); \
+        MCU_ASSERT_BASE(test_suite, __func__, (!(data == expected)), "\""#data" != "#expected"\""); \
         if (*nb_failed - nb_failed_before == 1) \
         { \
             mcu_log_values_##TYPE(data, expected); \
@@ -221,7 +244,7 @@ static char group_report[500000]; // should be long enough to hold full report
 #define MCU_ASSERT_EQUAL_STRING_BASE(data, expected) \
     do { \
         size_t nb_failed_before = *nb_failed; \
-        MCU_ASSERT_BASE(test_suite, __func__, (strcmp(data, expected) == 0), "DFAULT_EQUL_FAIL_MSG(data, expected)"); \
+        MCU_ASSERT_BASE(test_suite, __func__, (strcmp(data, expected) == 0), "\""#data" == "#expected"\""); \
         if (*nb_failed - nb_failed_before == 1) \
         { \
             mcu_log_values_string(data, expected); \
@@ -232,7 +255,7 @@ static char group_report[500000]; // should be long enough to hold full report
 #define MCU_ASSERT_NOT_EQUAL_STRING_BASE(data, expected) \
     do { \
         size_t nb_failed_before = *nb_failed; \
-        MCU_ASSERT_BASE(test_suite, __func__, (!(strcmp(data, expected) == 0)), "DFAULT_NOT_EQUL_FAIL_MSG(data, expected)"); \
+        MCU_ASSERT_BASE(test_suite, __func__, (!(strcmp(data, expected) == 0)), "\""#data" != "#expected"\""); \
         if (*nb_failed - nb_failed_before == 1) \
         { \
             mcu_log_values_string(data, expected); \
@@ -246,7 +269,7 @@ static char group_report[500000]; // should be long enough to hold full report
     do { \
         const float float_diff = ((data - expected) < 0) ? -(data - expected) : (data - expected); \
         size_t nb_failed_before = *nb_failed; \
-        MCU_ASSERT_BASE(test_suite, __func__, (float_diff <= precision), "DFAULT_EQUL_FAIL_MSG(data, expected)"); \
+        MCU_ASSERT_BASE(test_suite, __func__, (float_diff <= precision), "\""#data" == "#expected"\""); \
         if (*nb_failed - nb_failed_before == 1) \
         { \
             mcu_log_values_float(data, expected); \
@@ -257,7 +280,7 @@ static char group_report[500000]; // should be long enough to hold full report
     do { \
         const float float_diff = ((data - expected) < 0) ? -(data - expected) : (data - expected); \
         size_t nb_failed_before = *nb_failed; \
-        MCU_ASSERT_BASE(test_suite, __func__, (float_diff > precision), "DFAULT_NOT_EQUL_FAIL_MSG(data, expected)"); \
+        MCU_ASSERT_BASE(test_suite, __func__, (float_diff > precision), "\""#data" != "#expected"\""); \
         if (*nb_failed - nb_failed_before == 1) \
         { \
             mcu_log_values_float(data, expected); \
@@ -269,7 +292,7 @@ static char group_report[500000]; // should be long enough to hold full report
     do { \
         const double double_diff = ((data - expected) < 0) ? -(data - expected) : (data - expected); \
         size_t nb_failed_before = *nb_failed; \
-        MCU_ASSERT_BASE(test_suite, __func__, (double_diff <= precision), "DFAULT_NOT_EQUL_FAIL_MSG(data, expected)"); \
+        MCU_ASSERT_BASE(test_suite, __func__, (double_diff <= precision), "\""#data" == "#expected"\""); \
         if (*nb_failed - nb_failed_before == 1) \
         { \
             mcu_log_values_double(data, expected); \
@@ -280,7 +303,7 @@ static char group_report[500000]; // should be long enough to hold full report
     do { \
         const double double_diff = ((data - expected) < 0) ? -(data - expected) : (data - expected); \
         size_t nb_failed_before = *nb_failed; \
-        MCU_ASSERT_BASE(test_suite, __func__, (double_diff > precision), "DFAULT_NOT_EQUL_FAIL_MSG(data, expected)"); \
+        MCU_ASSERT_BASE(test_suite, __func__, (double_diff > precision), "\""#data" != "#expected"\""); \
         if (*nb_failed - nb_failed_before == 1) \
         { \
             mcu_log_values_double(data, expected); \
@@ -303,7 +326,7 @@ static char group_report[500000]; // should be long enough to hold full report
         { \
             *nb_failed+=1; \
             char array_test_results[1024]; \
-            sprintf(array_test_results,  "DFAULT_EQUL_FAIL_MSG(data, expected) : " MAG "%u ko / %u " RESET , nb_array_tests_failed, size); \
+            sprintf(array_test_results,  "\""#data" != "#expected"\" : " MAG "%u ko / %u " RESET , nb_array_tests_failed, size); \
             MCU_LOG_BASE(__FILENAME__, test_suite, __func__, __LINE__, array_test_results)  \
         } \
     } while(0)
@@ -453,10 +476,10 @@ static char group_report[500000]; // should be long enough to hold full report
 /// \param[in] cmp_function Hookup function which does the comparison of data and expected variables
 ///
 #define mcu_assert_equal_custom_cmp(cmp_function, data, expected) \
-    MCU_ASSERT_BASE(test_suite, __func__, ((cmp_function)((data), (expected))), "DFAULT_EQUL_FAIL_MSG(data, expected)")
+    MCU_ASSERT_BASE(test_suite, __func__, ((cmp_function)((data), (expected))), "\""#data" == "#expected"\"")
 
 #define mcu_assert_not_equal_custom_cmp(cmp_function, data, expected) \
-    MCU_ASSERT_BASE(test_suite, __func__, !((cmp_function)((data), (expected))), "DFAULT_NOT_EQUL_FAIL_MSG(data, expected)")
+    MCU_ASSERT_BASE(test_suite, __func__, !((cmp_function)((data), (expected))), "\""#data" != "#expected"\"")
 
 ///
 /// \brief Check if two variables are "equal" based on custom comparison function
@@ -483,43 +506,11 @@ static char group_report[500000]; // should be long enough to hold full report
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+////////////////////////////////////////////////////////////////////
+///                                                              ///
+///     DECLARATION AND EXECUTION OF TEST_CASES and TEST_SUITES  ///
+///                                                              ///
+////////////////////////////////////////////////////////////////////
 
 
 ///
@@ -530,7 +521,7 @@ static char group_report[500000]; // should be long enough to hold full report
 /// \param[in] name shortname of the test_case
 ///
 #define TEST_CASE_BEGIN(name) \
-    void test_case_##name(const char* const test_suite, size_t* nb_tests, size_t* nb_failed) \
+    static void test_case_##name(const char* const test_suite, size_t* nb_tests, size_t* nb_failed) \
     { \
         size_t start_nb_tests = *nb_tests;        \
         size_t start_nb_failed = *nb_failed;      \
@@ -568,10 +559,8 @@ static char group_report[500000]; // should be long enough to hold full report
 ///
 /// \param[in] name shortname of the test_case to run
 ///
-#define TEST_CASE_RUN(tc) \
-    do { \
-        test_case_##tc(__func__, &nbr_tests, &nbr_failed); \
-    } while (0)
+#define test_case_run(tc) \
+    test_case_##tc(__func__, &nbr_tests, &nbr_failed)
 
 
 
@@ -581,7 +570,7 @@ static char group_report[500000]; // should be long enough to hold full report
 ///
 /// \param[in] name shortname of the test_suite
 ///
-#define EXTERNAL_DECLARE_TEST_SUITE(name) \
+#define external_declare_test_suite(name) \
     extern const char* test_suite_##name()
 
 
@@ -662,7 +651,7 @@ static char group_report[500000]; // should be long enough to hold full report
 ///
 /// \param[in] name shortname of the test_case to run
 ///
-#define TEST_SUITE_RUN(name) \
+#define test_suite_run(name) \
     do { \
         if (group_report[0] == '\0') \
         { \
@@ -681,7 +670,7 @@ static char group_report[500000]; // should be long enough to hold full report
 ///
 /// \param[in] name The name of the group of test_suites
 ///
-#define TEST_GROUP_INITIALIZE(name) \
+#define test_group_initialize(name) \
     do { \
         sprintf(group_report, "UNITTEST GROUP %s \n**********\n", ""#name""); \
     } while (0)
@@ -690,7 +679,7 @@ static char group_report[500000]; // should be long enough to hold full report
 /// \brief Finalize and print the log report for overview of all test_suites report (only OK/KO with no verbosity)
 ///
 ///
-#define TEST_GROUP_FINALIZE() \
+#define test_group_finalize() \
     do { \
         LOG_FUNCTION(group_report); \
     } while (0)

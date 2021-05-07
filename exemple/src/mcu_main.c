@@ -7,11 +7,11 @@
 
 int main() {
 
-	TEST_GROUP_INITIALIZE(example_minicutest_ts_group);
+	test_group_initialize(example_minicutest_ts_group);
 	
-	TEST_SUITE_RUN(mcu_suite1);
+	test_suite_run(mcu_suite1);
 
-	TEST_GROUP_FINALIZE();
+	test_group_finalize();
 	
 	return(0);
 }
