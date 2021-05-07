@@ -70,8 +70,11 @@ static char group_report[500000]; // should be long enough to hold full report
 
 #define TEST_PASSED "PASSED"
 #define TEST_FAILED "FAILED"
+
+
+
 ///
-/// \brief Basic print/log function.
+/// \brief Basic print/log function for assert reporting.
 ///         Builds the message with useful information of where the assert has failed and call LOG_FUNCTION
 ///         One shall not use this MACRO. Internlly called by other macros
 ///
@@ -83,6 +86,84 @@ static char group_report[500000]; // should be long enough to hold full report
 ///
 #define MCU_LOG_BASE(filename, test_suite, test_case, line, message) \
     LOG_FUNCTION("%s::%s::%s:%u - Assertion failed : %s \n", filename, test_suite, test_case, line, message);
+
+
+///
+/// \brief Print the expected and obtained values based on printf formatting
+///
+/// \param[in] type The formatting type of the variables to print
+/// \param[in] data Variable obtained
+/// \param[in] expected Variable expected
+///
+#define MCU_LOG_VALUES(type, data, expected) \
+    do { \
+        if (VERBOSITY) \
+        { \
+            LOG_FUNCTION(MAG "Expected " #type " , obtained " #type RESET "\n", expected, data); \
+        } \
+    } while (0)
+
+///
+/// \brief Print the user-defined message
+///
+#define mcu_log(message) \
+    LOG_FUNCTION("%s\n", message)
+
+///
+/// \brief Print the compared variables in the form "Expected = x, obtained = y"
+///         Call base macro with the right formating depending on type
+///
+#define mcu_log_values_char(data, expected) \
+    MCU_LOG_VALUES(%c, data, expected)
+
+#define mcu_log_values_uchar(data, expected) \
+    MCU_LOG_VALUES(%c, data, expected)
+
+#define mcu_log_values_short(data, expected) \
+    MCU_LOG_VALUES(%i, data, expected)
+
+#define mcu_log_values_ushort(data, expected) \
+    MCU_LOG_VALUES(%u, data, expected)
+
+#define mcu_log_values_int(data, expected) \
+    MCU_LOG_VALUES(%i, data, expected)
+
+#define mcu_log_values_uint(data, expected) \
+    MCU_LOG_VALUES(%u, data, expected)
+
+#define mcu_log_values_long(data, expected) \
+    MCU_LOG_VALUES(%li, data, expected)
+
+#define mcu_log_values_ulong(data, expected) \
+    MCU_LOG_VALUES(%lu, data, expected)
+
+#define mcu_log_values_llong(data, expected) \
+    MCU_LOG_VALUES(%lli, data, expected)
+
+#define mcu_log_values_ullong(data, expected) \
+    MCU_LOG_VALUES(%llu, data, expected)
+
+#define mcu_log_values_string(data, expected) \
+    MCU_LOG_VALUES(%s, data, expected)
+
+#define mcu_log_values_ptr(data, expected) \
+    MCU_LOG_VALUES(%p, data, expected)
+
+#define mcu_log_values_size_t(data, expected) \
+    MCU_LOG_VALUES(%lu, data, expected)
+
+#define mcu_log_values_float(data, expected) \
+    MCU_LOG_VALUES(%f, data, expected)
+
+#define mcu_log_values_double(data, expected) \
+    MCU_LOG_VALUES(%lf, data, expected)
+
+
+
+
+
+
+
 
 
 ///
@@ -99,14 +180,13 @@ static char group_report[500000]; // should be long enough to hold full report
         *nb_tests+=1;                                                 \
         if ( !(expr) ) {                                \
             *nb_failed+=1;                                              \
-            MCU_LOG_BASE(__FILENAME__, test_suite, test_case, __LINE__, message);  \
+            MCU_LOG_BASE(__FILENAME__, test_suite, test_case, __LINE__, message)  \
         }                                                             \
     } while (0)
 
 
 
-#define mcu_log(message) \
-    LOG_FUNCTION("%s\n", message)
+
 
 #define mcu_assert_true(expr) \
     MCU_ASSERT_BASE(test_suite, __func__, (expr), "\""#expr" is not true\"")
@@ -124,20 +204,12 @@ static char group_report[500000]; // should be long enough to hold full report
 
 
 
-///
-/// \brief Print the expected and obtained values based on printf formatting
-///
-/// \param[in] type The formatting type of the variables to print
-/// \param[in] data Variable obtained in the assert test
-/// \param[in] expected Variable expected for the assert test
-///
-#define MCU_LOG_VALUES(type, data, expected) \
-    do { \
-        if (VERBOSITY) \
-        { \
-            LOG_FUNCTION(MAG "Expected " #type " , obtained " #type RESET "\n", expected, data); \
-        } \
-    } while (0)
+
+
+
+
+
+
 
 
 
@@ -158,7 +230,7 @@ static char group_report[500000]; // should be long enough to hold full report
         MCU_ASSERT_EQUAL_BASE(test_suite, __func__, data, expected, "\""#data" == "#expected"\""); \
         if (*nb_failed - nb_failed_before == 1) \
         { \
-            MCU_LOG_VALUES_##TYPE(data, expected); \
+            mcu_log_values_##TYPE(data, expected); \
         } \
     } while (0)
 
@@ -169,7 +241,7 @@ static char group_report[500000]; // should be long enough to hold full report
         MCU_ASSERT_NOT_EQUAL_BASE(test_suite, __func__, data, expected, "\""#data" != "#expected"\""); \
         if (*nb_failed - nb_failed_before == 1) \
         { \
-            MCU_LOG_VALUES_##TYPE(data, expected); \
+            mcu_log_values_##TYPE(data, expected); \
         } \
     } while (0)
 
@@ -185,11 +257,6 @@ static char group_report[500000]; // should be long enough to hold full report
     } while (0)
 
 
-#define MCU_LOG_VALUES_FLOAT(data, expected) \
-    MCU_LOG_VALUES(%f, data, expected);
-
-#define MCU_LOG_VALUES_DOUBLE(data, expected) \
-    MCU_LOG_VALUES(%lf, data, expected);
 
 
 #define MCU_ASSERT_EQUAL_FLOAT(data, expected, precision) \
@@ -199,7 +266,7 @@ static char group_report[500000]; // should be long enough to hold full report
         MCU_ASSERT_EQUAL_FLOATING_BASE(test_suite, __func__, float_diff, precision, "\""#data" == "#expected"\""); \
         if (*nb_failed - nb_failed_before == 1) \
         { \
-            MCU_LOG_VALUES_FLOAT(data, expected); \
+            mcu_log_values_float(data, expected); \
         } \
     } while (0)
 
@@ -210,7 +277,7 @@ static char group_report[500000]; // should be long enough to hold full report
         MCU_ASSERT_NOT_EQUAL_FLOATING_BASE(test_suite, __func__, float_diff, precision, "\""#data" == "#expected"\""); \
         if (*nb_failed - nb_failed_before == 1) \
         { \
-            MCU_LOG_VALUES_FLOAT(data, expected); \
+            mcu_log_values_float(data, expected); \
         } \
     } while (0)
 
@@ -221,7 +288,7 @@ static char group_report[500000]; // should be long enough to hold full report
         MCU_ASSERT_EQUAL_FLOATING_BASE(test_suite, __func__, double_diff, precision, "\""#data" != "#expected"\""); \
         if (*nb_failed - nb_failed_before == 1) \
         { \
-            MCU_LOG_VALUES_DOUBLE(data, expected); \
+            mcu_log_values_double(data, expected); \
         } \
     } while (0)
 
@@ -232,7 +299,7 @@ static char group_report[500000]; // should be long enough to hold full report
         MCU_ASSERT_NOT_EQUAL_FLOATING_BASE(test_suite, __func__, double_diff, precision, "\""#data" != "#expected"\""); \
         if (*nb_failed - nb_failed_before == 1) \
         { \
-            MCU_LOG_VALUES_DOUBLE(data, expected); \
+            mcu_log_values_double(data, expected); \
         } \
     } while (0)
 
@@ -251,8 +318,7 @@ static char group_report[500000]; // should be long enough to hold full report
     } while (0)
 
 
-#define MCU_LOG_VALUES_STRING(data, expected) \
-    MCU_LOG_VALUES(%s, data, expected);
+
 
 
 
@@ -262,7 +328,7 @@ static char group_report[500000]; // should be long enough to hold full report
         MCU_ASSERT_EQUAL_STRING_BASE(test_suite, __func__, (strcmp(data, expected) == 0), "\""#data" == "#expected"\""); \
         if (*nb_failed - nb_failed_before == 1) \
         { \
-            MCU_LOG_VALUES_STRING(data, expected); \
+            mcu_log_values_string(data, expected); \
         } \
     } while (0)
 
@@ -272,7 +338,7 @@ static char group_report[500000]; // should be long enough to hold full report
         MCU_ASSERT_NOT_EQUAL_STRING_BASE(test_suite, __func__, (strcmp(data, expected) == 0), "\""#data" != "#expected"\""); \
         if (*nb_failed - nb_failed_before == 1) \
         { \
-            MCU_LOG_VALUES_STRING(data, expected); \
+            mcu_log_values_string(data, expected); \
         } \
     } while (0)
 
@@ -328,74 +394,54 @@ static char group_report[500000]; // should be long enough to hold full report
 
 
 
-///
-/// \brief Print the compared int variables by assert_equal_int
-///
-/// \param[in] data Int variable obtained in the assert test
-/// \param[in] expected Int variable expected for the assert test
-///
-#define MCU_LOG_VALUES_CHAR(data, expected) \
-    MCU_LOG_VALUES(%c, data, expected);
+
 
 #define mcu_assert_equal_char(data, expected) \
-    MCU_ASSERT_EQUAL_BASE_TYPE(CHAR, data, expected);
+    MCU_ASSERT_EQUAL_BASE_TYPE(char, data, expected);
 
 #define mcu_assert_not_equal_char(data, expected) \
-    MCU_ASSERT_NOT_EQUAL_BASE_TYPE(CHAR, data, expected);
+    MCU_ASSERT_NOT_EQUAL_BASE_TYPE(char, data, expected);
 
 
 
 
 
 
-#define MCU_LOG_VALUES_UCHAR(data, expected) \
-    MCU_LOG_VALUES(%c, data, expected);
 
 #define mcu_assert_equal_uchar(data, expected) \
-    MCU_ASSERT_EQUAL_BASE_TYPE(UCHAR, data, expected);
+    MCU_ASSERT_EQUAL_BASE_TYPE(uchar, data, expected);
 
 #define mcu_assert_not_equal_uchar(data, expected) \
-    MCU_ASSERT_NOT_EQUAL_BASE_TYPE(UCHAR, data, expected);
+    MCU_ASSERT_NOT_EQUAL_BASE_TYPE(uchar, data, expected);
 
 
 
 
-#define MCU_LOG_VALUES_SHORT(data, expected) \
-    MCU_LOG_VALUES(%i, data, expected);
 
 #define mcu_assert_equal_short(data, expected) \
-    MCU_ASSERT_EQUAL_BASE_TYPE(SHORT, data, expected);
+    MCU_ASSERT_EQUAL_BASE_TYPE(short, data, expected);
 
 #define mcu_assert_not_equal_short(data, expected) \
-    MCU_ASSERT_NOT_EQUAL_BASE_TYPE(SHORT, data, expected);
+    MCU_ASSERT_NOT_EQUAL_BASE_TYPE(short, data, expected);
 
 
 
-#define MCU_LOG_VALUES_USHORT(data, expected) \
-    MCU_LOG_VALUES(%u, data, expected);
 
 #define mcu_assert_equal_ushort(data, expected) \
-    MCU_ASSERT_EQUAL_BASE_TYPE(USHORT, data, expected);
+    MCU_ASSERT_EQUAL_BASE_TYPE(ushort, data, expected);
 
 #define mcu_assert_not_equal_ushort(data, expected) \
-    MCU_ASSERT_NOT_EQUAL_BASE_TYPE(USHORT, data, expected);
+    MCU_ASSERT_NOT_EQUAL_BASE_TYPE(ushort, data, expected);
 
 
 
-///
-/// \brief Print the compared int variables by assert_equal_int
-///
-/// \param[in] data Int variable obtained in the assert test
-/// \param[in] expected Int variable expected for the assert test
-///
-#define MCU_LOG_VALUES_INT(data, expected) \
-    MCU_LOG_VALUES(%i, data, expected);
+
 
 #define mcu_assert_equal_int(data, expected) \
-    MCU_ASSERT_EQUAL_BASE_TYPE(INT, data, expected);
+    MCU_ASSERT_EQUAL_BASE_TYPE(int, data, expected);
 
 #define mcu_assert_not_equal_int(data, expected) \
-    MCU_ASSERT_NOT_EQUAL_BASE_TYPE(INT, data, expected);
+    MCU_ASSERT_NOT_EQUAL_BASE_TYPE(int, data, expected);
 
 
 
@@ -416,7 +462,7 @@ static char group_report[500000]; // should be long enough to hold full report
             *nb_failed+=1; \
             char array_test_results[1024]; \
             sprintf(array_test_results,  "\""#data" == "#expected"\" : " MAG "%u ko / %u " RESET , nb_array_tests_failed, size); \
-            MCU_LOG_BASE(__FILENAME__, test_suite, __func__, __LINE__, array_test_results);  \
+            MCU_LOG_BASE(__FILENAME__, test_suite, __func__, __LINE__, array_test_results)  \
         } \
     } while(0)
 
@@ -428,70 +474,59 @@ static char group_report[500000]; // should be long enough to hold full report
 
 
 
-#define MCU_LOG_VALUES_UINT(data, expected) \
-    MCU_LOG_VALUES(%u, data, expected);
 
 #define mcu_assert_equal_uint(data, expected) \
-    MCU_ASSERT_EQUAL_BASE_TYPE(UINT, data, expected);
+    MCU_ASSERT_EQUAL_BASE_TYPE(uint, data, expected);
 
 #define mcu_assert_not_equal_uint(data, expected) \
-    MCU_ASSERT_NOT_EQUAL_BASE_TYPE(UINT, data, expected);
+    MCU_ASSERT_NOT_EQUAL_BASE_TYPE(uint, data, expected);
 
 
 
-#define MCU_LOG_VALUES_LONG(data, expected) \
-    MCU_LOG_VALUES(%li, data, expected);
 
 #define mcu_assert_equal_long(data, expected) \
-    MCU_ASSERT_EQUAL_BASE_TYPE(LONG, data, expected);
+    MCU_ASSERT_EQUAL_BASE_TYPE(long, data, expected);
 
 #define mcu_assert_not_equal_long(data, expected) \
-    MCU_ASSERT_NOT_EQUAL_BASE_TYPE(LONG, data, expected);
+    MCU_ASSERT_NOT_EQUAL_BASE_TYPE(long, data, expected);
 
 
 
-#define MCU_LOG_VALUES_ULONG(data, expected) \
-    MCU_LOG_VALUES(%lu, data, expected);
 
 #define mcu_assert_equal_ulong(data, expected) \
-    MCU_ASSERT_EQUAL_BASE_TYPE(ULONG, data, expected);
+    MCU_ASSERT_EQUAL_BASE_TYPE(ulong, data, expected);
 
 #define mcu_assert_not_equal_ulong(data, expected) \
-    MCU_ASSERT_NOT_EQUAL_BASE_TYPE(ULONG, data, expected);
+    MCU_ASSERT_NOT_EQUAL_BASE_TYPE(ulong, data, expected);
 
 
-#define MCU_LOG_VALUES_ULONG(data, expected) \
-    MCU_LOG_VALUES(%lu, data, expected);
+
 
 #define mcu_assert_equal_ulong(data, expected) \
-    MCU_ASSERT_EQUAL_BASE_TYPE(ULONG, data, expected);
+    MCU_ASSERT_EQUAL_BASE_TYPE(ulong, data, expected);
 
 #define mcu_assert_not_equal_ulong(data, expected) \
-    MCU_ASSERT_NOT_EQUAL_BASE_TYPE(ULONG, data, expected);
+    MCU_ASSERT_NOT_EQUAL_BASE_TYPE(ulong, data, expected);
 
 
-#define MCU_LOG_VALUES_LLONG(data, expected) \
-    MCU_LOG_VALUES(%lli, data, expected);
+
 
 #define mcu_assert_equal_llong(data, expected) \
-    MCU_ASSERT_EQUAL_BASE_TYPE(LLONG, data, expected);
+    MCU_ASSERT_EQUAL_BASE_TYPE(llong, data, expected);
 
 #define mcu_assert_not_equal_llong(data, expected) \
-    MCU_ASSERT_NOT_EQUAL_BASE_TYPE(LLONG, data, expected);
+    MCU_ASSERT_NOT_EQUAL_BASE_TYPE(llong, data, expected);
 
 
-#define MCU_LOG_VALUES_ULLONG(data, expected) \
-    MCU_LOG_VALUES(%llu, data, expected);
+
 
 #define mcu_assert_equal_ullong(data, expected) \
-    MCU_ASSERT_EQUAL_BASE_TYPE(ULLONG, data, expected);
+    MCU_ASSERT_EQUAL_BASE_TYPE(ullong, data, expected);
 
 #define mcu_assert_not_equal_ullong(data, expected) \
-    MCU_ASSERT_NOT_EQUAL_BASE_TYPE(ULLONG, data, expected);
+    MCU_ASSERT_NOT_EQUAL_BASE_TYPE(ullong, data, expected);
 
 
-#define MCU_LOG_VALUES_SIZE_T(data, expected) \
-    MCU_LOG_VALUES_ULONG(data, expected);
 
 #define mcu_assert_equal_size_t(data, expected) \
     mcu_assert_equal_ulong(data, expected);
@@ -502,20 +537,18 @@ static char group_report[500000]; // should be long enough to hold full report
 
 
 
-#define MCU_LOG_VALUES_PTR(data, expected) \
-    MCU_LOG_VALUES(%p, data, expected);
 
 #define mcu_assert_equal_ptr(data, expected) \
-    MCU_ASSERT_EQUAL_BASE_TYPE(PTR, data, expected);
+    MCU_ASSERT_EQUAL_BASE_TYPE(ptr, data, expected);
 
 #define mcu_assert_not_equal_ptr(data, expected) \
-    MCU_ASSERT_NOT_EQUAL_BASE_TYPE(PTR, data, expected);
+    MCU_ASSERT_NOT_EQUAL_BASE_TYPE(ptr, data, expected);
 
-#define mcu_assert_null_ptr(ptr) \
-    MCU_ASSERT_EQUAL_BASE_TYPE(PTR, ptr, NULL);
+#define mcu_assert_null_ptr(pointer) \
+    MCU_ASSERT_EQUAL_BASE_TYPE(ptr, pointer, NULL);
 
-#define mcu_assert_not_null_ptr(ptr) \
-    MCU_ASSERT_NOT_EQUAL_BASE_TYPE(PTR, ptr, NULL);
+#define mcu_assert_not_null_ptr(pointer) \
+    MCU_ASSERT_NOT_EQUAL_BASE_TYPE(ptr, pointer, NULL);
 
 
 
