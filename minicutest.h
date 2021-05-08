@@ -126,6 +126,11 @@ static char group_report[500000]; // should be long enough to hold full report
 #define mcu_log(message) \
     LOG_FUNCTION("%s\n", message)
 
+
+//-----------------------//
+//------- LOG API -------//
+//-----------------------//
+
 ///
 /// \brief Print the compared variables in the form "Expected = x, obtained = y"
 ///         Call base macro with the right formating depending on type
@@ -212,6 +217,7 @@ static char group_report[500000]; // should be long enough to hold full report
 ///
 /// \brief Base macro for testing equality of two variables. For type for which true == is possible
 ///         Prints values in case of error (with the good format for print)
+///         One shall not use this MACRO. Internally called by other assert macros
 ///
 #define MCU_ASSERT_EQUAL_TYPE_BASE(TYPE, data, expected)                            \
     do { \
@@ -227,6 +233,7 @@ static char group_report[500000]; // should be long enough to hold full report
 ///
 /// \brief Base macro for testing that two variables are not equal. For type for which true == is possible
 ///         Prints values in case of error (with the good format for print)
+///         One shall not use this MACRO. Internally called by other assert macros
 ///
 #define MCU_ASSERT_NOT_EQUAL_TYPE_BASE(TYPE, data, expected)                            \
     do { \
@@ -239,8 +246,11 @@ static char group_report[500000]; // should be long enough to hold full report
     } while (0)
 
 
-
-
+///
+/// \brief Base macro for testing that two strings are equal.
+///         Prints values in case of error (with the good format for print)
+///         One shall not use this MACRO. Internally called by other assert macros
+///
 #define MCU_ASSERT_EQUAL_STRING_BASE(data, expected) \
     do { \
         size_t nb_failed_before = *nb_failed; \
@@ -252,6 +262,11 @@ static char group_report[500000]; // should be long enough to hold full report
     } while (0)
 
 
+///
+/// \brief Base macro for testing that two strings are not equal.
+///         Prints values in case of error (with the good format for print)
+///         One shall not use this MACRO. Internally called by other assert macros
+///
 #define MCU_ASSERT_NOT_EQUAL_STRING_BASE(data, expected) \
     do { \
         size_t nb_failed_before = *nb_failed; \
@@ -264,7 +279,11 @@ static char group_report[500000]; // should be long enough to hold full report
 
 
 
-
+///
+/// \brief Base macro for testing that two floats are equal.
+///         Prints values in case of error (with the good format for print)
+///         One shall not use this MACRO. Internally called by other assert macros
+///
 #define MCU_ASSERT_EQUAL_FLOAT_BASE(data, expected, precision) \
     do { \
         const float float_diff = ((data - expected) < 0) ? -(data - expected) : (data - expected); \
@@ -276,6 +295,12 @@ static char group_report[500000]; // should be long enough to hold full report
         } \
     } while (0)
 
+
+///
+/// \brief Base macro for testing that two floats are not equal.
+///         Prints values in case of error (with the good format for print)
+///         One shall not use this MACRO. Internally called by other assert macros
+///
 #define MCU_ASSERT_NOT_EQUAL_FLOAT_BASE(data, expected, precision) \
     do { \
         const float float_diff = ((data - expected) < 0) ? -(data - expected) : (data - expected); \
@@ -288,6 +313,11 @@ static char group_report[500000]; // should be long enough to hold full report
     } while (0)
 
 
+///
+/// \brief Base macro for testing that two doubles are equal.
+///         Prints values in case of error (with the good format for print)
+///         One shall not use this MACRO. Internally called by other assert macros
+///
 #define MCU_ASSERT_EQUAL_DOUBLE_BASE(data, expected, precision) \
     do { \
         const double double_diff = ((data - expected) < 0) ? -(data - expected) : (data - expected); \
@@ -299,6 +329,12 @@ static char group_report[500000]; // should be long enough to hold full report
         } \
     } while (0)
 
+
+///
+/// \brief Base macro for testing that two doubles are equal.
+///         Prints values in case of error (with the good format for print)
+///         One shall not use this MACRO. Internally called by other assert macros
+///
 #define MCU_ASSERT_NOT_EQUAL_DOUBLE_BASE(data, expected, precision) \
     do { \
         const double double_diff = ((data - expected) < 0) ? -(data - expected) : (data - expected); \
@@ -310,6 +346,17 @@ static char group_report[500000]; // should be long enough to hold full report
         } \
     } while (0)
 
+
+///
+/// \brief Base macro for testing that two arrays are equal. This macro will test the expr for each index.
+///         Prints values in case of error (with the good format for print)
+///         One shall not use this MACRO. Internally called by other assert macros
+///
+/// \param[in] data  The first array of the comparison. Used only for displaying failure message
+/// \param[in] expected The expected array of the comparison. Used only for displaying failure message
+/// \param[in] expr  the comparison expression. Must be built by calling-macro knowing in advance how to test the arrays
+/// \param[in] size Length of the arrays
+///
 #define MCU_ASSERT_EQUAL_ARRAY_BASE(data, expected, expr, size) \
     do \
     { \
@@ -332,6 +379,10 @@ static char group_report[500000]; // should be long enough to hold full report
     } while(0)
 
 
+
+//-----------------------//
+//------ ASSERT API -----//
+//-----------------------//
 
 #define mcu_assert_true(expr) \
     MCU_ASSERT_BASE(test_suite, __func__, (expr), "\""#expr" is not true\"")
