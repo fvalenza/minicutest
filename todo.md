@@ -2,16 +2,17 @@ TODOLIST
 ---
 
 - Fix warnings -Wformats and -Wformat_security ?
-- Finish Readme (+ exemple of user customization : User defined macros for int16, int32 etc... as it is platform dependent. Shall be a custom .h file that includes minicutest.h ? + define VERBOSITY / LOG_FUNCTION)
+
 
 
 
 Potential improvments
 ---
 
+- Missing exhaustive list of all assert types with \_message.
 - Rework verbosity ? (Different levels : each index of array, for each test in test cases, and test_group_overview )
 - Add boolean ? With user defined boolean macros ??
-- For arrays, add with verbosity the print of each line that failed ? Too verbose no  ? If I add it, it should be something like this.
+- For arrays, add with verbosity the print of each line that failed ? Too verbose maybe  ? If I add it, it should be something like this.
 
 ```
 	#define MCU_ASSERT_EQUAL_TYPE_ARRAY_BASE(type, data, expected, expr, size) \
