@@ -558,10 +558,14 @@ static char group_report[500000]; // should be long enough to hold full report
 #define mcu_assert_equal_int_array(data, expected, size) \
     MCU_ASSERT_EQUAL_ARRAY_BASE(data, expected, !((data)[idx] == (expected)[idx]), size)
 
+#define mcu_assert_equal_int_array_each(data, expected, size) \
+    MCU_ASSERT_EQUAL_ARRAY_BASE(data, expected, !((data)[idx] == expected), size)
+
 #define mcu_assert_equal_custom_cmp_array(cmp_function, data, expected, size) \
     MCU_ASSERT_EQUAL_ARRAY_BASE(data, expected, !((cmp_function)(((data)[idx]), ((expected)[idx]))), size)
 
-
+#define mcu_assert_equal_custom_cmp_array_each(cmp_function, data, expected, size) \
+    MCU_ASSERT_EQUAL_ARRAY_BASE(data, expected, !((cmp_function)(((data)[idx]), (expected))), size)
 
 
 
