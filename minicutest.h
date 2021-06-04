@@ -233,10 +233,10 @@ static char group_report[500000]; // should be long enough to hold full report
 #define MCU_ASSERT_EQUAL_TYPE_BASE(TYPE, data, expected)                            \
     do { \
         size_t nb_failed_before = *nb_failed; \
-        MCU_ASSERT_BASE(test_suite, __func__, (data == expected), "\""#data" == "#expected"\""); \
+        MCU_ASSERT_BASE(test_suite, __func__, ((data) == (expected)), "\""#data" == "#expected"\""); \
         if (*nb_failed - nb_failed_before == 1) \
         { \
-            mcu_log_values_##TYPE(data, expected); \
+            mcu_log_values_##TYPE((data), (expected)); \
         } \
     } while (0)
 
@@ -249,10 +249,10 @@ static char group_report[500000]; // should be long enough to hold full report
 #define MCU_ASSERT_NOT_EQUAL_TYPE_BASE(TYPE, data, expected)                            \
     do { \
         size_t nb_failed_before = *nb_failed; \
-        MCU_ASSERT_BASE(test_suite, __func__, (!(data == expected)), "\""#data" != "#expected"\""); \
+        MCU_ASSERT_BASE(test_suite, __func__, (!((data) == (expected))), "\""#data" != "#expected"\""); \
         if (*nb_failed - nb_failed_before == 1) \
         { \
-            mcu_log_values_##TYPE(data, expected); \
+            mcu_log_values_##TYPE((data), (expected)); \
         } \
     } while (0)
 
@@ -265,10 +265,10 @@ static char group_report[500000]; // should be long enough to hold full report
 #define MCU_ASSERT_EQUAL_STRING_BASE(data, expected) \
     do { \
         size_t nb_failed_before = *nb_failed; \
-        MCU_ASSERT_BASE(test_suite, __func__, (strcmp(data, expected) == 0), "\""#data" == "#expected"\""); \
+        MCU_ASSERT_BASE(test_suite, __func__, (strcmp((data), (expected)) == 0), "\""#data" == "#expected"\""); \
         if (*nb_failed - nb_failed_before == 1) \
         { \
-            mcu_log_values_string(data, expected); \
+            mcu_log_values_string((data), (expected)); \
         } \
     } while (0)
 
@@ -281,10 +281,10 @@ static char group_report[500000]; // should be long enough to hold full report
 #define MCU_ASSERT_NOT_EQUAL_STRING_BASE(data, expected) \
     do { \
         size_t nb_failed_before = *nb_failed; \
-        MCU_ASSERT_BASE(test_suite, __func__, (!(strcmp(data, expected) == 0)), "\""#data" != "#expected"\""); \
+        MCU_ASSERT_BASE(test_suite, __func__, (!(strcmp((data), (expected)) == 0)), "\""#data" != "#expected"\""); \
         if (*nb_failed - nb_failed_before == 1) \
         { \
-            mcu_log_values_string(data, expected); \
+            mcu_log_values_string((data), (expected)); \
         } \
     } while (0)
 
@@ -297,12 +297,12 @@ static char group_report[500000]; // should be long enough to hold full report
 ///
 #define MCU_ASSERT_EQUAL_FLOAT_BASE(data, expected, precision) \
     do { \
-        const float float_diff = ((data - expected) < 0) ? -(data - expected) : (data - expected); \
+        const float float_diff = (((data) - (expected)) < 0) ? -((data) - (expected)) : ((data) - (expected)); \
         size_t nb_failed_before = *nb_failed; \
         MCU_ASSERT_BASE(test_suite, __func__, (float_diff <= precision), "\""#data" == "#expected"\""); \
         if (*nb_failed - nb_failed_before == 1) \
         { \
-            mcu_log_values_float(data, expected); \
+            mcu_log_values_float((data), (expected)); \
         } \
     } while (0)
 
@@ -314,12 +314,12 @@ static char group_report[500000]; // should be long enough to hold full report
 ///
 #define MCU_ASSERT_NOT_EQUAL_FLOAT_BASE(data, expected, precision) \
     do { \
-        const float float_diff = ((data - expected) < 0) ? -(data - expected) : (data - expected); \
+        const float float_diff = (((data) - (expected)) < 0) ? -((data) - (expected)) : ((data) - (expected)); \
         size_t nb_failed_before = *nb_failed; \
         MCU_ASSERT_BASE(test_suite, __func__, (float_diff > precision), "\""#data" != "#expected"\""); \
         if (*nb_failed - nb_failed_before == 1) \
         { \
-            mcu_log_values_float(data, expected); \
+            mcu_log_values_float((data), (expected)); \
         } \
     } while (0)
 
@@ -331,12 +331,12 @@ static char group_report[500000]; // should be long enough to hold full report
 ///
 #define MCU_ASSERT_EQUAL_DOUBLE_BASE(data, expected, precision) \
     do { \
-        const double double_diff = ((data - expected) < 0) ? -(data - expected) : (data - expected); \
+        const double double_diff = (((data) - (expected)) < 0) ? -((data) - (expected)) : ((data) - (expected)); \
         size_t nb_failed_before = *nb_failed; \
         MCU_ASSERT_BASE(test_suite, __func__, (double_diff <= precision), "\""#data" == "#expected"\""); \
         if (*nb_failed - nb_failed_before == 1) \
         { \
-            mcu_log_values_double(data, expected); \
+            mcu_log_values_double((data), (expected)); \
         } \
     } while (0)
 
@@ -348,12 +348,12 @@ static char group_report[500000]; // should be long enough to hold full report
 ///
 #define MCU_ASSERT_NOT_EQUAL_DOUBLE_BASE(data, expected, precision) \
     do { \
-        const double double_diff = ((data - expected) < 0) ? -(data - expected) : (data - expected); \
+        const double double_diff = (((data) - (expected)) < 0) ? -((data) - (expected)) : ((data) - (expected)); \
         size_t nb_failed_before = *nb_failed; \
         MCU_ASSERT_BASE(test_suite, __func__, (double_diff > precision), "\""#data" != "#expected"\""); \
         if (*nb_failed - nb_failed_before == 1) \
         { \
-            mcu_log_values_double(data, expected); \
+            mcu_log_values_double((data), (expected)); \
         } \
     } while (0)
 
@@ -375,7 +375,7 @@ static char group_report[500000]; // should be long enough to hold full report
         int nb_array_tests_failed = 0; \
         for (size_t idx = 0; idx < size; ++idx) \
         { \
-            if (expr) \
+            if ((expr)) \
             { \
                 ++nb_array_tests_failed; \
             } \
@@ -556,10 +556,10 @@ static char group_report[500000]; // should be long enough to hold full report
 
 
 #define mcu_assert_equal_int_array(data, expected, size) \
-    MCU_ASSERT_EQUAL_ARRAY_BASE(data, expected, !(data[idx] == expected[idx]), size)
+    MCU_ASSERT_EQUAL_ARRAY_BASE(data, expected, !((data)[idx] == (expected)[idx]), size)
 
 #define mcu_assert_equal_custom_cmp_array(cmp_function, data, expected, size) \
-    MCU_ASSERT_EQUAL_ARRAY_BASE(data, expected, !((cmp_function)((data[idx]), (expected[idx]))), size)
+    MCU_ASSERT_EQUAL_ARRAY_BASE(data, expected, !((cmp_function)(((data)[idx]), ((expected)[idx]))), size)
 
 
 
