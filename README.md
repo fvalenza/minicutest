@@ -106,6 +106,8 @@ These two problems can be solved using a custom header that includes minicutest,
 
 #define VERBOSITY_USER (0x01)  // To only have first level of verbosity
 
+#define ANSI_NOT_SUPPORTED  // To disable log coloration in case your terminal does not support ANSI tags (for example, ECLIPSE without plugins)
+
 #define CUSTOM_PRINT_METHOD my_terrific_logger // Do not use printf for logging but custom logger
 
 #define my_assert_equal_uint8 mcu_assert_equal_uchar // For 8-bit unsigned integer, use minicutest unsigned-char asserts

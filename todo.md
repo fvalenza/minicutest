@@ -10,7 +10,7 @@ Potential improvments
 ---
 
 - Missing exhaustive list of all assert types with \_message.
-- Rework verbosity ? (Different levels : each index of array, for each test in test cases, and test_group_overview )
+- Rework verbosity ? (Different levels : each index of array, for each test in test cases, and test_group_overview ). Each level of verbosity shall be macro at the very begining of minicutest and then #define VERBOSITY_USER (VERBOSITY_LVL_1 | VERBOSITY_LVL_2) etc...
 - Add boolean ? With user defined boolean macros ??
 - For arrays, add with verbosity the print of each line that failed ? Too verbose maybe  ? If I add it, it should be something like this.
 
