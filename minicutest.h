@@ -520,7 +520,7 @@ static char group_report[500000]; // should be long enough to hold full report
 
 // expects the relative_precision expressed in %
 #define mcu_assert_equal_float_rel(data, expected, rel_precision) \
-    MCU_ASSERT_EQUAL_FLOAT_BASE(data, expected, (rel_precision * expected))
+    MCU_ASSERT_EQUAL_FLOAT_BASE(data, expected, ((rel_precision) * ((expected) < 0.0 ? -(expected) : (expected)) ))
 
 
 #define mcu_assert_equal_double(data, expected, precision) \
@@ -528,7 +528,7 @@ static char group_report[500000]; // should be long enough to hold full report
 
 // expects the relative_precision expressed in %
 #define mcu_assert_equal_double_rel(data, expected, rel_precision) \
-    MCU_ASSERT_EQUAL_DOUBLE_BASE(data, expected, (rel_precision * expected))
+    MCU_ASSERT_EQUAL_DOUBLE_BASE(data, expected, ((rel_precision) * ((expected) < 0.0 ? -(expected) : (expected)) ))
 
 
 
@@ -554,18 +554,23 @@ static char group_report[500000]; // should be long enough to hold full report
 
 
 
-
 #define mcu_assert_equal_int_array(data, expected, size) \
     MCU_ASSERT_EQUAL_ARRAY_BASE(data, expected, !((data)[idx] == (expected)[idx]), size)
 
 #define mcu_assert_equal_int_array_each(data, expected, size) \
-    MCU_ASSERT_EQUAL_ARRAY_BASE(data, expected, !((data)[idx] == expected), size)
+    MCU_ASSERT_EQUAL_ARRAY_BASE(data, expected, !((data)[idx] == (expected)), size)
 
 #define mcu_assert_equal_custom_cmp_array(cmp_function, data, expected, size) \
     MCU_ASSERT_EQUAL_ARRAY_BASE(data, expected, !((cmp_function)(((data)[idx]), ((expected)[idx]))), size)
 
 #define mcu_assert_equal_custom_cmp_array_each(cmp_function, data, expected, size) \
     MCU_ASSERT_EQUAL_ARRAY_BASE(data, expected, !((cmp_function)(((data)[idx]), (expected))), size)
+
+#define mcu_assert_equal_float_array(data, expected, precision, size) \
+    MCU_ASSERT_EQUAL_ARRAY_BASE(data, expected, (((data)[idx] - (expected)[idx]) < 0 ? ((expected)[idx] - (data)[idx]) : ((data)[idx] - (expected)[idx])) > (precision), size)
+
+#define mcu_assert_equal_float_array_each(data, expected, precision, size) \
+    MCU_ASSERT_EQUAL_ARRAY_BASE(data, expected, (((data)[idx] - (expected)) < 0 ? ((expected) - (data)[idx]) : ((data)[idx] - (expected))) > (precision), size)
 
 
 
