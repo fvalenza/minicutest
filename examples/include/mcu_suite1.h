@@ -1,7 +1,7 @@
 #ifndef MCU_SUITE1_H
 #define MCU_SUITE1_H
 
-#include <minicutest.h>
+#include <minicutest/minicutest.h>
 
 typedef struct
 {

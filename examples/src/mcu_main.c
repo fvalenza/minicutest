@@ -1,7 +1,7 @@
 #include <stdio.h>
 
 #define VERBOSITY_USER (0x01)
-#include <minicutest.h>
+#include <minicutest/minicutest.h>
 #include <mcu_suite1.h>
 
 

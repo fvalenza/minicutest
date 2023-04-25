@@ -36,7 +36,8 @@
 *.i*86
 *.x86_64
 *.hex
-exemple/bin/*
+build/
+example/build/*
 
 # Debug files
 *.dSYM/
